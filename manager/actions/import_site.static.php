@@ -219,7 +219,7 @@ function importFiles($parent,$filedir,$files,$mode) {
 					$field['createdon'] = $date;
 					$field['editedon'] = $date;
 					$rs = $modx->db->insert($field,$tbl_site_content);
-					if($rs) $new_parent = mysql_insert_id(); // get new parent id
+					if($rs) $new_parent = $modx->db->getInsertId(); // get new parent id
 					else
 					{
 						echo '<span class="fail">'.$_lang["import_site_failed"]."</span> "
@@ -310,7 +310,7 @@ function importFiles($parent,$filedir,$files,$mode) {
 				if($filename == 'index.html') $is_site_start = true;
 				if($is_site_start==true && $_POST['reset']=='on')
 				{
-					$newid = mysql_insert_id();
+					$newid = $modx->db->getInsertId();
 					$tbl_system_settings = $modx->getFullTableName('system_settings');
 					$sql = "REPLACE INTO {$tbl_system_settings} (setting_name, setting_value) VALUES ('site_start', '{$newid}')";
 					$modx->db->query($sql);

@@ -117,7 +117,7 @@ switch ($_POST['mode']) {
 			exit;
 		}
 		// now get the id
-		if (!$key = mysql_insert_id()) {
+		if (!$key = $modx->db->getInsertId()) {
 			//get the key by sql
 		}
 
