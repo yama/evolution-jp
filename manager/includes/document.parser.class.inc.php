@@ -53,7 +53,7 @@ class DocumentParser {
     var $qs_hash;
 
     // constructor
-	function DocumentParser()
+	function DocumentParser($database_type='mysql')
 	{
 		if(!isset($_REQUEST['id']))
 		{
@@ -62,7 +62,7 @@ class DocumentParser {
 		}
 		if($_REQUEST['q']=='index.php') $_REQUEST['q'] = '';
 		
-		$this->loadExtension('DBAPI') or die('Could not load DBAPI class.'); // load DBAPI class
+		$this->loadExtension('DBAPI',$database_type) or die('Could not load DBAPI class.'); // load DBAPI class
 		// events
 		$this->event= new SystemEvent();
 		$this->Event= & $this->event; //alias for backward compatibility
@@ -79,15 +79,13 @@ class DocumentParser {
 	}
 
 	// loads an extension from the extenders folder
-	function loadExtension($extname)
+	function loadExtension($extname,$addOption=null)
 	{
-		global $database_type;
-		
 		switch ($extname)
 		{
 			// Database API
 			case 'DBAPI' :
-				if(include_once(MODX_BASE_PATH . "manager/includes/extenders/dbapi.{$database_type}.class.inc.php"))
+				if(include_once(MODX_BASE_PATH . "manager/includes/extenders/dbapi.{$addOption}.class.inc.php"))
 				{
 					$this->db= new DBAPI;
 					$this->dbConfig= & $this->db->config; // alias for backward compatibility
