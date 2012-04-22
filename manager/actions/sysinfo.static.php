@@ -43,6 +43,7 @@ if(!$modx->hasPermission('logs')) {
 		<?php echo render_tr($_lang['cfg_manager_url'],MODX_MANAGER_URL);?>
 		<?php echo render_tr($_lang['cfg_manager_path'],MODX_MANAGER_PATH);?>
 		<?php echo render_tr($_lang['cfg_site_url'],MODX_SITE_URL);?>
+		<?php echo render_tr($_lang['cfg_PDO_enable'],$modx->usePDO?'on':'off');?>
 		</table>
    </div>
 

@@ -88,6 +88,7 @@ $_lang["cfg_base_url"] = 'MODX_BASE_URL';
 $_lang["cfg_manager_path"] = 'MODX_MANAGER_PATH';
 $_lang["cfg_manager_url"] = 'MODX_MANAGER_URL';
 $_lang["cfg_site_url"] = 'MODX_SITE_URL';
+$_lang["cfg_PDO_enable"] = 'PDO利用';
 $_lang["change_name"] = 'ログイン名を変更';
 $_lang["change_password"] = 'パスワード変更';
 $_lang["change_password_confirm"] = 'パスワードをもう一度';

@@ -51,6 +51,7 @@ class DocumentParser {
     var $documentMap_cache;
     var $safeMode;
     var $qs_hash;
+    var $usePDO = false;
 
     // constructor
 	function DocumentParser($database_type='mysql')
@@ -85,6 +86,17 @@ class DocumentParser {
 		{
 			// Database API
 			case 'DBAPI' :
+				if($this->usePDO && class_exists('PDO') )
+				{
+					if(include_once(MODX_BASE_PATH . "manager/includes/extenders/dbapi.pdo.class.inc.php"))
+					{
+						$this->db= new DBAPI;
+						$this->db->setDatabaseType($addOption);
+						return true;
+					}
+					else return false;
+				}
+				$this->usePDO=false;
 				if(include_once(MODX_BASE_PATH . "manager/includes/extenders/dbapi.{$addOption}.class.inc.php"))
 				{
 					$this->db= new DBAPI;
