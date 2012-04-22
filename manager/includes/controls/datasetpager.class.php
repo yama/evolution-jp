@@ -86,6 +86,10 @@ class DataSetPager {
 		global $modx,$_PAGE;
 			
 		$isDataset = is_resource($this->ds);
+                if( is_object($this->ds) ){  // for PDO
+                        $isDataset = true;
+                        $isPDO = true;
+                }
 		
 		if (!$this->selPageStyle) $this->selPageStyle = "font-weight:bold";
 		

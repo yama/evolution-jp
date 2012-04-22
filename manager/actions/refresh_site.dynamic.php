@@ -6,11 +6,25 @@ $tbl_site_content = $modx->getFullTableName('site_content');
 
 $where = "pub_date < {$now} AND pub_date!=0 AND published=0 AND ({$now} < unpub_date or unpub_date=0)";
 $rs = $modx->db->update(array('published'=>'1'),$tbl_site_content,$where);
-$num_rows_pub = $modx->db->getAffectedRows();
+if( is_object($rs) )
+{ // for PDO
+	$num_rows_pub = $modx->db->getAffectedRows($rs);
+}
+else
+{
+	$num_rows_pub = $modx->db->getAffectedRows();
+}
 
 $where = "unpub_date < {$now} AND unpub_date!=0 AND published=1";
 $rs = $modx->db->update(array('published'=>'0'),$tbl_site_content,$where);
-$num_rows_unpub = $modx->db->getAffectedRows();
+if( is_object($rs) )
+{ // for PDO
+	$num_rows_unpub = $modx->db->getAffectedRows($rs);
+}
+else
+{
+	$num_rows_unpub = $modx->db->getAffectedRows();
+}
 
 ?>
 

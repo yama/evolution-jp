@@ -180,15 +180,27 @@ class DataGrid {
 		$this->_total = 0;
 		
 		$this->_isDataset = is_resource($this->ds); // if not dataset then treat as array
+		if( is_object($this->ds) ){  // for PDO
+			$this->_isDataset = true;
+			$this->_isPDO = true;
+		}
 
 		if(!$cssStyle && !$cssClass) $cssStyle = 'style="width:100%;font-family:verdana,arial; font-size:12px;"';
 		if(!$this->_itemStyle && !$this->_itemClass) $this->_itemStyle = "style='color:#333333;'";
 		if(!$this->_altItemStyle && !$this->_altItemClass) $this->_altItemStyle = "style='color:#333333;background-color:#eeeeee'";
 
 		if($this->_isDataset && !$this->columns) {
-			$cols = mysql_num_fields($this->ds);
-			for($i=0;$i<$cols;$i++)
-				$this->columns.= ($i ? ",":"").mysql_field_name($this->ds,$i);
+			if( $this->_isPDO ) {
+				$cols = $this->ds->columnCount();
+				for($i=0;$i<$cols;$i++){
+					$md=$ds->getColumnMeta($i);
+					$this->columns.= ($i ? ",":"").$md['name'];
+				}
+			}else{
+				$cols = mysql_num_fields($this->ds);
+				for($i=0;$i<$cols;$i++)
+					$this->columns.= ($i ? ",":"").mysql_field_name($this->ds,$i);
+			}
 		}
 		
 		// start grid
