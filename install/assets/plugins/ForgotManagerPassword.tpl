@@ -121,9 +121,15 @@ EOT;
 			global $modx, $_lang;
 			
 			$tbl_user_attributes = $modx->getFullTableName('user_attributes');
-			$modx->db->update('blocked=0,blockeduntil=0,failedlogincount=0', $tbl_user_attributes, "internalKey='{$user_id}'");
-			
-			if(!$modx->db->getAffectedRows()) { $this->errors[] = $_lang['user_doesnt_exist']; return; }
+			$rs = $modx->db->update('blocked=0,blockeduntil=0,failedlogincount=0', $tbl_user_attributes, "internalKey='{$user_id}'");
+
+			if( is_object($rs) )
+			{
+				$rslt=$modx->db->getAffectedRows($rs);
+			}else{
+				$rslt=$modx->db->getAffectedRows();
+			}
+			if(!$rslt) { $this->errors[] = $_lang['user_doesnt_exist']; return; }
 			
 			return true;
 		}
