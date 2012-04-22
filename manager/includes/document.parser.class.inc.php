@@ -3558,7 +3558,10 @@ class DocumentParser {
         // Log error
         if($source!=='') $source = 'Parser - ' . $source;
         else             $source = 'Parser';
-        $this->logEvent(0, 3, $str,$source);
+	if( $this->db->isConnected )
+	{
+       	 	$this->logEvent(0, 3, $str,$source);
+	}
         if($nr == E_DEPRECATED) return true;
 
         // Set 500 response header
