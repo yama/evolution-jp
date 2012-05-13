@@ -51,6 +51,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}event_log` (
 CREATE TABLE IF NOT EXISTS `{PREFIX}keyword_xref` (
   `content_id` int(11) NOT NULL default '0',
   `keyword_id` int(11) NOT NULL default '0',
+  PRIMARY KEY ( `content_id` , `keyword_id` ),
   KEY `content_id` (`content_id`),
   KEY `keyword_id` (`keyword_id`)
 ) ENGINE=MyISAM COMMENT='Cross reference bewteen keywords and content';
@@ -146,6 +147,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}site_content` (
 CREATE TABLE IF NOT EXISTS `{PREFIX}site_content_metatags` (
   `content_id` int(11) NOT NULL default '0',
   `metatag_id` int(11) NOT NULL default '0',
+  PRIMARY KEY ( `content_id` , `metatag_id` ),
   KEY `content_id` (`content_id`),
   KEY `metatag_id` (`metatag_id`)
 ) ENGINE=MyISAM COMMENT='Reference table between meta tags and content';
@@ -235,7 +237,8 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}site_plugins` (
 CREATE TABLE IF NOT EXISTS `{PREFIX}site_plugin_events` (
   `pluginid` INT(10) NOT NULL,
   `evtid` INT(10) NOT NULL default 0,
-  `priority` INT(10) NOT NULL default 0 COMMENT 'determines plugin run order'
+  `priority` INT(10) NOT NULL default 0 COMMENT 'determines plugin run order',
+  PRIMARY KEY ( `pluginid` , `evtid` )
 ) ENGINE=MyISAM COMMENT='Links to system events';
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}site_snippets` (
@@ -276,7 +279,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}system_eventnames` (
 CREATE TABLE IF NOT EXISTS `{PREFIX}system_settings` (
   `setting_name` varchar(50) NOT NULL default '',
   `setting_value` text,
-  UNIQUE KEY `setting_name` (`setting_name`)
+  PRIMARY KEY (`setting_name`)
 ) ENGINE=MyISAM COMMENT='Contains Content Manager settings.';
 
 CREATE TABLE IF NOT EXISTS `{PREFIX}site_tmplvar_access` (
@@ -441,6 +444,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}user_settings` (
   `user` integer NOT NULL,
   `setting_name` varchar(50) NOT NULL default '',
   `setting_value` text,
+  PRIMARY KEY ( `user` , `setting_name` ),
   KEY `setting_name` (`setting_name`),
   KEY `user` (`user`)
 ) ENGINE=MyISAM COMMENT='Contains backend user settings.';
@@ -508,6 +512,7 @@ CREATE TABLE IF NOT EXISTS `{PREFIX}web_user_settings` (
   `webuser` integer NOT NULL,
   `setting_name` varchar(50) NOT NULL default '',
   `setting_value` text,
+  PRIMARY KEY ( `webuser` , `setting_name` ),
   KEY `setting_name` (`setting_name`),
   KEY `webuserid` (`webuser`)
 ) ENGINE=MyISAM COMMENT='Contains web user settings.';
@@ -711,6 +716,31 @@ ALTER TABLE `{PREFIX}member_groups` ADD UNIQUE INDEX `ix_group_member` (`user_gr
 
 ALTER TABLE `{PREFIX}web_groups` ADD UNIQUE INDEX `ix_group_user` (`webgroup`,`webuser`);
 
+ALTER TABLE `{PREFIX}system_settings`
+ DROP INDEX `setting_name` ,
+ ADD PRIMARY KEY ( `setting_name` );
+
+ALTER TABLE `{PREFIX}user_settings`
+ DROP PRIMARY KEY,
+ ADD PRIMARY KEY ( `user` , `setting_name` );
+
+ALTER TABLE `{PREFIX}web_user_settings`
+ DROP PRIMARY KEY,
+ ADD PRIMARY KEY ( `webuser` , `setting_name` );
+
+ALTER TABLE `{PREFIX}site_plugin_events`
+ DROP PRIMARY KEY,
+ ADD PRIMARY KEY ( `pluginid` , `evtid` );
+
+ALTER TABLE `{PREFIX}keyword_xref`
+ DROP PRIMARY KEY,
+ ADD PRIMARY KEY ( `content_id` , `keyword_id` );
+
+ALTER TABLE `{PREFIX}site_content_metatags`
+ DROP PRIMARY KEY,
+ ADD PRIMARY KEY ( `content_id` , `metatag_id` );
+
+
 # Set the private manager group flag
 UPDATE `{PREFIX}documentgroup_names` AS dgn
   LEFT JOIN `{PREFIX}membergroup_access` AS mga ON mga.documentgroup = dgn.id
@@ -776,6 +806,7 @@ INSERT IGNORE INTO `{PREFIX}system_settings`
 ('manager_language','{MANAGERLANGUAGE}'),
 ('modx_charset','UTF-8'),
 ('site_name','My MODX Site'),
+('site_slogan','ここにサイトのスローガン文を表示します。'),
 ('site_start','1'),
 ('error_page','1'),
 ('unauthorized_page','1'),
@@ -845,7 +876,7 @@ INSERT IGNORE INTO `{PREFIX}system_settings`
 ('datepicker_offset','-10'),
 ('xhtml_urls','1'),
 ('allow_duplicate_alias','0'),
-('automatic_alias','0'),
+('automatic_alias','2'),
 ('datetime_format','YYYY/mm/dd'),
 ('warning_visibility', '0'),
 ('remember_last_tab', '1'),

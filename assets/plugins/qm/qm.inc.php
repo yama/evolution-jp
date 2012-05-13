@@ -4,7 +4,7 @@
  *
  * @author      Mikko Lammi, www.maagit.fi
  * @license     GNU General Public License (GPL), http://www.gnu.org/copyleft/gpl.html
- * @version     1.5.5 updated 12/01/2011
+ * @version     1.5.5r5 updated 12/01/2011
  */
 
 $show = TRUE;
@@ -34,7 +34,7 @@ class Qm {
 		extract($params);
 		
 		// Get plugin parameters
-		$this->jqpath = 'assets/js/getjs.php?target=jquery';
+		$this->jqpath = 'assets/js/jquery.min.js';
 		$this->loadmanagerjq = $loadmanagerjq;
 		$this->loadfrontendjq = $loadfrontendjq;
 		$this->noconflictjq = $noconflictjq;

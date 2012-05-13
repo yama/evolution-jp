@@ -639,12 +639,16 @@ class DocumentParser {
 				case '.html':
 				case '.htm':
 					$mime_type = 'text/html'; break;
+				case '.xml':
+				case '.rdf':
+					$mime_type = 'text/xml'; break;
 				case '.css':
 					$mime_type = 'text/css'; break;
 				case '.js':
 					$mime_type = 'text/javascript'; break;
 				case '.txt':
 					$mime_type = 'text/plain'; break;
+				case '.ico':
 				case '.jpg':
 				case '.jpeg':
 				case '.png':
@@ -1079,10 +1083,10 @@ class DocumentParser {
 	}
 	
 	// mod by Raymond
-	function mergeDocumentContent($template)
+	function mergeDocumentContent($content)
 	{
 		$replace= array ();
-		preg_match_all('~\[\*(.*?)\*\]~', $template, $matches);
+		preg_match_all('~\[\*(.*?)\*\]~', $content, $matches);
 		$variableCount= count($matches[1]);
 		$basepath= $this->config['base_path'] . 'manager/includes/';
 		include_once("{$basepath}tmplvars.format.inc.php");
@@ -1098,15 +1102,15 @@ class DocumentParser {
 			}
 			$replace[$i]= $value;
 		}
-		$template= str_replace($matches[0], $replace, $template);
-		return $template;
+		$content= str_replace($matches[0], $replace, $content);
+		return $content;
 	}
 		
-	function mergeSettingsContent($template)
+	function mergeSettingsContent($content)
 	{
 		$replace= array ();
 		$matches= array ();
-		if(preg_match_all('~\[\(([a-z\_]*?)\)\]~', $template, $matches))
+		if(preg_match_all('~\[\(([a-z\_]*?)\)\]~', $content, $matches))
 		{
 			$total= count($matches[1]);
 			for($i= 0; $i < $total; $i++)
@@ -1117,9 +1121,9 @@ class DocumentParser {
 				}
 			}
 			
-			$template= str_replace($matches[0], $replace, $template);
+			$content= str_replace($matches[0], $replace, $content);
 		}
-		return $template;
+		return $content;
 	}
 	
 	function mergeChunkContent($content)
@@ -1188,6 +1192,27 @@ class DocumentParser {
 			$content= str_replace($matches[0], $replace, $content);
 		}
 		return $content;
+	}
+	
+	function mergeCommentedTagsContent($content)
+	{
+		$pieces = explode('<!-- #modx',$content);
+		$stack = '';
+		$total = count($pieces);
+		for($i=0;$i<$total;$i++)
+		{
+			$_ = $pieces[$i];
+			if($i!==0)
+			{
+				list($modxelm,$txt) = explode('-->',$_, 2);
+				$modxelm = trim($modxelm);
+				$txt = substr($txt,strpos($txt,'<!-- /#modx'));
+				$txt = substr($txt,strpos($txt,'-->')+3);
+				$_ = $modxelm . $txt;
+			}
+			 $stack .= $_;
+		}
+		return $stack;
 	}
 	
 	function mergeBenchmarkContent($content)
@@ -1423,31 +1448,32 @@ class DocumentParser {
 		list($call,$snip['except_snip_call']) = explode(']]', $src, 2);
 		if(strpos($call, '?') !== false && strpos($call, "\n")!==false && strpos($call, '?') < strpos($call, "\n"))
 		{
-			list($snip['name'],$snip['params']) = explode('?',$call,2);
+			list($name,$params) = explode('?',$call,2);
 		}
 		elseif(strpos($call, '?') !== false && strpos($call, "\n")!==false && strpos($call, "\n") < strpos($call, '?'))
 		{
-			list($snip['name'],$snip['params']) = explode("\n",$call,2);
+			list($name,$params) = explode("\n",$call,2);
 		}
 		elseif(strpos($call, '?') !== false)
 		{
-			list($snip['name'],$snip['params']) = explode('?',$call,2);
+			list($name,$params) = explode('?',$call,2);
 		}
 		elseif((strpos($call, '&') !== false) && (strpos($call, '=') !== false) && (strpos($call, '?') === false))
 		{
-			list($snip['name'],$snip['params']) = explode("&",$call,2);
-			$snip['params'] = '&' . $snip['params'];
+			list($name,$params) = explode('&',$call,2);
+			$params = "&{$params}";
 		}
 		elseif(strpos($call, "\n") !== false)
 		{
-			list($snip['name'],$snip['params']) = explode("\n",$call,2);
+			list($name,$params) = explode("\n",$call,2);
 		}
 		else
 		{
-			$snip['name'] = $call;
-			$snip['params'] = '';
+			$name   = $call;
+			$params = '';
 		}
-		$snip['name'] = trim($snip['name']);
+		$snip['name']   = trim($name);
+		$snip['params'] = $params;
 		return $snip;
 	}
 	
@@ -1721,6 +1747,7 @@ class DocumentParser {
 			$this->invokeEvent('OnParseDocument'); // work on it via $modx->documentOutput
 			$source= $this->documentOutput;
 			
+			if(strpos($source,'<!-- #modx')!==false) $source= $this->mergeCommentedTagsContent($source);
 			// combine template and document variables
 			if(strpos($source,'[*')!==false) $source= $this->mergeDocumentContent($source);
 			// replace settings referenced in document

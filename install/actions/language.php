@@ -4,8 +4,6 @@ $ph['_lang_begin']         = $_lang['begin'];
 $ph['_lang_btnnext_value'] = $_lang['btnnext_value'];
 echo  parse(get_src_content(),$ph);
 
-
-
 function get_langs()
 {
 	$langs = array();

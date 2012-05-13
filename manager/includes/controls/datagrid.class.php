@@ -288,5 +288,3 @@ class DataGrid {
 		return $o;
 	}
 }
-
-?>

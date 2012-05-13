@@ -76,6 +76,7 @@ if ($action == 27) {
 <div class="sectionHeader"><?php echo $_lang['access_permissions']?></div>
 <div class="sectionBody">
 	<p><?php echo $_lang['access_permission_denied']?></p>
+</div>
 <?php
 		include(MODX_MANAGER_PATH.'includes/footer.inc.php');
 		exit;
@@ -219,6 +220,10 @@ function undeletedocument() {
 	}
 }
 
+function movedocument() {
+	document.location.href="index.php?id=<?php echo $_REQUEST['id'];?>&a=51";
+}
+
 function duplicatedocument(){
     if(confirm("<?php echo $_lang['confirm_resource_duplicate']?>")==true) {
         document.location.href="index.php?id=<?php echo $_REQUEST['id']?>&a=94";
@@ -227,7 +232,7 @@ function duplicatedocument(){
 
 function resetpubdate() {
 	if(document.mutate.pub_date.value!=''||document.mutate.unpub_date.value!='') {
-		if (confirm("公開開始日時・公開終了日時をリセットします")==true) {
+		if (confirm("<?php echo $_lang['mutate_content.dynamic.php1'];?>")==true) {
 			document.mutate.pub_date.value='';
 			document.mutate.unpub_date.value='';
 		}
@@ -440,19 +445,6 @@ $_SESSION['itemname'] = to_safestr($content['pagetitle']);
 			  <option id="stay3" value=""  <?php echo $_REQUEST['stay']=='' ? ' selected=""' : ''?>  ><?php echo $_lang['close']?></option>
 			</select>		
 		  </li>
-		  <?php
-            if ($_REQUEST['a'] !== '4' && $_REQUEST['a'] !== '72')
-            { ?>
-          <li id="Button6"><a href="#" onclick="duplicatedocument();"><img src="<?php echo $_style["icons_resource_duplicate"] ?>" alt="icons_resource_duplicate" /> <?php echo $_lang['duplicate']?></a></li>
-          <?php
-          if($content['deleted'] === '0')
-          {
-          ?>
-          <li id="Button3"><a href="#" onclick="deletedocument();"><img src="<?php echo $_style["icons_delete_document"] ?>" alt="icons_delete_document" /> <?php echo $_lang['delete']; ?></a></li>
-          <?php } else { ?>
-          <li id="Button3"><a href="#" onclick="undeletedocument();"><img src="<?php echo $_style["icons_undelete_resource"] ?>" alt="icons_undelete_document" /> <?php echo $_lang['undelete_resource']?></a></li>
-          <?php } ?>
-		  <?php } ?>
           <li id="Button4"><a href="#" onclick="
 <?php
 				if(isset($content['parent']) && $content['parent']!=='0')
@@ -481,6 +473,22 @@ $_SESSION['itemname'] = to_safestr($content['pagetitle']);
 				}
 ?>
           	"><img alt="icons_cancel" src="<?php echo $_style["icons_cancel"] ?>" /> <?php echo $_lang['cancel']?></a></li>
+		  <?php
+            if ($_REQUEST['a'] !== '4' && $_REQUEST['a'] !== '72' && $id != $modx->config['site_start'])
+            { ?>
+		  <li id="Button2">
+			<a href="#" onclick="movedocument();"><img src="<?php echo $_style["icons_move_document"] ?>" /> <?php echo $_lang['move']?></a>
+		  </li>
+          <li id="Button6"><a href="#" onclick="duplicatedocument();"><img src="<?php echo $_style["icons_resource_duplicate"] ?>" alt="icons_resource_duplicate" /> <?php echo $_lang['duplicate']?></a></li>
+          <?php
+          if($content['deleted'] === '0')
+          {
+          ?>
+          <li id="Button3"><a href="#" onclick="deletedocument();"><img src="<?php echo $_style["icons_delete_document"] ?>" alt="icons_delete_document" /> <?php echo $_lang['delete']; ?></a></li>
+          <?php } else { ?>
+          <li id="Button3"><a href="#" onclick="undeletedocument();"><img src="<?php echo $_style["icons_undelete_resource"] ?>" alt="icons_undelete_document" /> <?php echo $_lang['undelete_resource']?></a></li>
+          <?php } ?>
+		  <?php } ?>
           <?php
             if ($_REQUEST['a'] !== '4' && $_REQUEST['a'] !== '72') { ?>
           <li id="Button5"><a href="#" onclick="window.open('<?php echo $modx->makeUrl($id); ?>','previeWin');"><img alt="icons_preview_resource" src="<?php echo $_style["icons_preview_resource"] ?>" /> <?php echo $_lang['preview']?></a></li>
@@ -1063,7 +1071,7 @@ if ($_SESSION['mgrRole'] == 1 || $_REQUEST['a'] != '27' || $_SESSION['mgrInterna
 				<td>
 				<?php
 					$cond = ((isset($content['cacheable']) && $content['cacheable']==1) || (!isset($content['cacheable']) && $cache_default==1));
-					$disabled = ($cache_enabled==0) ? ' disabled="disabled"' : '';
+					$disabled = ($cache_type==0) ? ' disabled="disabled"' : '';
 					echo input_checkbox('cacheable',$cond,$disabled);
 					echo input_hidden('cacheable',$cond);
 					echo tooltip($_lang['page_data_cacheable_help']);?>
@@ -1076,7 +1084,7 @@ if ($_SESSION['mgrRole'] == 1 || $_REQUEST['a'] != '27' || $_SESSION['mgrInterna
 				<td><span class="warning"><?php echo $_lang['resource_opt_emptycache']?></span></td>
 				<td>
 				<?php
-					$disabled = ($cache_enabled==0) ? ' disabled="disabled"' : '';
+					$disabled = ($cache_type==0) ? ' disabled="disabled"' : '';
 					echo input_checkbox('syncsite',true,$disabled);
 					echo input_hidden('syncsite');
 					echo tooltip($_lang['resource_opt_emptycache_help']);?>

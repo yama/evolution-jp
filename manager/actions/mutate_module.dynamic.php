@@ -339,13 +339,11 @@ function SetUrl(url, width, height, alt) {
     			  <option id="stay3" value=""  <?php echo $_REQUEST['stay']=='' ? ' selected=""' : ''?>  ><?php echo $_lang['close']?></option>
     			</select>		
     		  </li>
+    		  <li id="Button5"><a href="#" onclick="documentDirty=false;document.location.href='index.php?a=106';"><img src="<?php echo $_style["icons_cancel"] ?>" /> <?php echo $_lang['cancel']?></a></li>
     		  <?php
     			if ($_REQUEST['a'] == '108') { ?>
-    		  <li id="Button2" class="disabled"><a href="#" onclick="deletedocument();"><img src="<?php echo $_style["icons_delete_document"]?>" /> <?php echo $_lang['delete']?></a></li>
-    		  <?php } else { ?>
     		  <li id="Button2"><a href="#" onclick="deletedocument();"><img src="<?php echo $_style["icons_delete_document"]?>" /> <?php echo $_lang['delete']?></a></li>
     		  <?php } ?>	
-    		  <li id="Button5"><a href="#" onclick="documentDirty=false;document.location.href='index.php?a=106';"><img src="<?php echo $_style["icons_cancel"] ?>" /> <?php echo $_lang['cancel']?></a></li>
     		  <?php // In Place for future extraction of actionbar
         			if ($_REQUEST['a'] == '27') { ?>
         			    <li id="Button6"><a href="#" onclick="window.open('<?php echo $modx->makeUrl($id); ?>','previeWin');"><img src="<?php echo $_style["icons_preview"]?>" /> <?php echo $_lang['preview']?></a></li>
@@ -460,7 +458,7 @@ function SetUrl(url, width, height, alt) {
 	<div class="sectionBody">
 		<p><?php echo $_lang['module_viewdepend_msg']?></p>
 		<p class="actionButtons">
-		<a href="#" onclick="loadDependencies();return false;"><img src="<?php echo $_style["icons_save"]?>" align="absmiddle" /> <?php echo $_lang['manage_depends']?></a></p>
+		<a href="#" onclick="loadDependencies();return false;"><img src="<?php echo $_style["icons_edit_document"]?>" align="absmiddle" /> <?php echo $_lang['manage_depends']?></a></p>
 <?php
 	$sql = 'SELECT smd.id, COALESCE(ss.name,st.templatename,sv.name,sc.name,sp.name,sd.pagetitle) AS `name`, '.
 	       'CASE smd.type'.
