@@ -302,6 +302,7 @@ class PHx {
 				$value = preg_replace('/[\n\r\t\s]+/', $opt, $value); break;
 			case 'notags':
 			case 'strip_tags':
+			case 'remove_html':
 				if($opt!=='')
 				{
 					foreach(explode(',',$opt) as $v)
