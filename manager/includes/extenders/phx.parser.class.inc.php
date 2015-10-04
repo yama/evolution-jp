@@ -376,6 +376,14 @@ class PHx {
 			  	$limit = intval($opt) ? intval($opt) : 100;
 				$value = $this->substr($value,0,$limit);
 				break;
+			case 'summary':
+			case 'smart_description':
+			case 'smart_desc':
+			  	if(strpos($opt,',')) list($limit,$delim) = explode(',', $opt);
+				elseif(preg_match('/^[1-9][0-9]*$/',$opt)) {$limit=$opt;$delim='';}
+				else {$limit=100;$delim='';}
+				$value = $this->getSummary($value, $limit, $delim);
+				break;
 			case 'str_shuffle':
 			case 'shuffle':
 				$value = $this->str_shuffle($value); break;
