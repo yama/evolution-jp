@@ -290,6 +290,7 @@ class PHx {
 			case 'htmlentities':
 				$value = htmlentities($value,ENT_QUOTES,$modx->config['modx_charset']); break;
 			case 'html_entity_decode':
+			case 'decode_html':
 				$value = html_entity_decode($value,ENT_QUOTES,$modx->config['modx_charset']); break;
 			case 'esc':
 			case 'escape':
