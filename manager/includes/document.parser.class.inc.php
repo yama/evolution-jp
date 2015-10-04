@@ -1273,7 +1273,7 @@ class DocumentParser {
         return $id;
     }
     // mod by Raymond
-    function mergeDocumentContent($content)
+    function mergeDocumentContent($content,$convertDate=true)
     {
         if(!isset($this->documentIdentifier)) return $content;
         if(strpos($content,'[*')===false) return $content;
@@ -1321,7 +1321,7 @@ class DocumentParser {
                 $this->loadExtension('PHx') or die('Could not load PHx class.');
                 $value = $this->filter->phxFilter($key,$value,$modifiers);
             }
-            else
+            elseif($convertDate)
             {
                 switch($key)
                 {
