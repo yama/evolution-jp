@@ -2009,31 +2009,6 @@ class DocumentParser {
         else return false;
     }
     
-    function set_aliases()
-    {
-        $path_aliases = MODX_BASE_PATH . 'assets/cache/aliases.siteCache.idx.php';
-        $aliases = array();
-        if(is_file($path_aliases))
-        {
-            $aliases = @include_once($path_aliases);
-            $this->aliases = $aliases;
-        }
-        if(empty($aliases))
-        {
-            if(!$this->aliasListing) $this->setAliasListing();
-            
-            $aliases= array ();
-            foreach ($this->aliasListing as $doc)
-            {
-                $aliases[$doc['id']]= (0<strlen($doc['path']) ? $doc['path'] . '/' : '') . $doc['alias'];
-            }
-            $cache = "<?php\n" . 'return ' . var_export($aliases, true) . ';';
-            file_put_contents($path_aliases, $cache, LOCK_EX);
-            $this->aliases = $aliases;
-        }
-        return $this->aliases;
-    }
-
     /**
     * name: getDocumentObject  - used by parser
     * desc: returns a document object - $method: alias, id
