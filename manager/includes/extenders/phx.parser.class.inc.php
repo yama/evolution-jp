@@ -733,6 +733,11 @@ class PHx {
                     }
                 }
                 break;
+            case 'setvar':
+            	$modx->placeholders[$opt] = $value;
+            	return;
+            	break;
+
 			// If we haven't yet found the modifier, let's look elsewhere
 			default:
 				$value = $this->getValueFromElement($phxkey, $value, $cmd, $opt);
