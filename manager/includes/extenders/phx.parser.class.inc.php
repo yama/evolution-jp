@@ -448,6 +448,10 @@ class PHx {
 			case 'tobool':
 				$value = boolval($value);
 				break;
+            case 'round':
+                if(!$opt) $opt = 0;
+                $value = $cmd($value,$opt);
+                break;
 			case 'addbreak':
 				$value = $this->addbreak($value);
 				break;
