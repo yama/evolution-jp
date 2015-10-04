@@ -357,7 +357,7 @@ if(isset($_SESSION['last_result']) || !empty($_SESSION['last_result']))
 	</div>
 	<style type="text/css">
 	table {background-color:#fff;border-collapse:collapse;}
-	table td {border:1px solid #ccc;padding:4px;}
+	table td {padding:4px;}
 	.msg {background-color:#edffee;border:2px solid #3ab63a;padding:8px;margin-bottom:8px;}
 	</style>
 <div class="sectionHeader"><?php echo $_lang["bkmgr_snapshot_list_title"];?></div>
