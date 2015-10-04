@@ -2193,8 +2193,6 @@ class DocumentParser {
         if($id==='') $id = $this->documentIdentifier;
         $parents= array ();
         
-        if(empty($this->aliasListing)) $this->setAliasListing();
-        
         while( $id && 0<$height)
         {
             $current_id = $id;
@@ -2508,7 +2506,6 @@ class DocumentParser {
             $makeurl = $alPath . $f_url_prefix . $alias . $f_url_suffix;
         }
         else {
-            if(!$this->aliasListing)  $this->setAliasListing();
             if(isset($this->aliasListing[$id])) $makeurl= "index.php?id={$id}";
             else return false;
         }
