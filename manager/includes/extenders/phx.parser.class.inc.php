@@ -349,6 +349,28 @@ class PHx {
 			  	$wrapat = intval($opt) ? intval($opt) : 70;
 				$value = preg_replace("~(\b\w+\b)~e","wordwrap('\\1',\$wrapat,' ',1)",$value);
 				break;
+			case 'wrap_text':
+			  	$width = preg_match('/^[1-9][0-9]*$/',$opt) ? $opt : 70;
+			  	if($modx->config['manager_language']==='japanese-utf8')
+				{
+					$chunk = array();
+					$c=0;
+					while($c<10000)
+			  		{
+			  			$c++;
+			  			if($this->strlen($value)<$width)
+						{
+							$chunk[] = $value;
+							break;
+			  			}
+			  			$chunk[] = $this->substr($value,0,$width);
+			  			$value = $this->substr($value,$width);
+					}
+					$value = join("\n",$chunk);
+			  	}
+			  	else
+			  		$value = wordwrap($value,$width,"\n",true);
+				break;
 			case 'limit':
 				// default: 100
 			  	$limit = intval($opt) ? intval($opt) : 100;
