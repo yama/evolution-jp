@@ -712,6 +712,27 @@ class PHx {
                 $i = $i % $c;
                 $value = $_[$i];
                 break;
+            case 'getimage':
+                $pattern = '/<img[\s\n]+src=[\s\n]*"([^"]+\.(jpg|jpeg|png|gif))"[^>]+>/i';
+                preg_match_all($pattern , $value , $images);
+                if($opt==='')
+                {
+                    if($images[1][0]) $value = $images[1][0];
+                    else               $value = '';
+                }
+                else
+                {
+                    $value = '';
+                    foreach($images[0] as $i=>$image)
+                    {
+                        if(strpos($image,$opt)!==false)
+                        {
+                            $value = $images[1][$i];
+                            break;
+                        }
+                    }
+                }
+                break;
 			// If we haven't yet found the modifier, let's look elsewhere
 			default:
 				$value = $this->getValueFromElement($phxkey, $value, $cmd, $opt);
