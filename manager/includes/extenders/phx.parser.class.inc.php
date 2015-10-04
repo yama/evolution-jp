@@ -400,7 +400,7 @@ class PHx {
 				if($opt) $value = $this->getDocumentObject($opt,$phxkey);
 				break;
 			case 'type':
-			case 'contentType':
+			case 'contenttype':
 			case 'pagetitle':
 			case 'longtitle':
 			case 'description':
@@ -435,6 +435,7 @@ class PHx {
 			case 'privatemgr':
 			case 'content_dispo':
 			case 'hidemenu':
+				if($cmd==='contenttype') $cmd = 'contentType';
 				$value = $this->getDocumentObject($value,$cmd);
 				break;
 			case 'title':
