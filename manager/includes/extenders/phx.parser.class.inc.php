@@ -464,6 +464,14 @@ class PHx {
 			case 'addbreak':
 				$value = $this->addbreak($value);
 				break;
+			case 'capitalize':
+				$_ = explode(' ',$value);
+				foreach($_ as $i=>$v)
+				{
+					$_[$i] = ucfirst($v);
+				}
+				$value = join(' ',$_);
+				break;
 			case 'nl2br':
 				if($modx->config['mce_element_format']==='html')
 					$value = nl2br($value,false);
