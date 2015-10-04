@@ -83,7 +83,7 @@ $tpl['tab-page']['general'] = <<< EOT
 <!-- start main wrapper -->
 	<!-- General -->
 	<div class="tab-page" id="tabGeneral">
-		<h2 class="tab">[+_lang_settings_general+]</h2>
+		<h2 class="tab" id="tabGeneralHeader">[+_lang_settings_general+]</h2>
 		<script type="text/javascript">
 			tpSettings.addTabPage(document.getElementById('tabGeneral'));
 		</script>
@@ -108,7 +108,7 @@ EOT;
 $tpl['tab-page']['tv'] = <<< EOT
 <!-- TVs -->
 <div class="tab-page" id="tabTv">
-	<h2 class="tab">[+_lang_tv+]</h2>
+	<h2 class="tab" id="tabTvHeader">[+_lang_tv+]</h2>
 	<script type="text/javascript">
 		tpSettings.addTabPage(document.getElementById('tabTv'));
 	</script>
@@ -119,7 +119,7 @@ EOT;
 $tpl['tab-page']['settings'] = <<< EOT
 	<!-- Settings -->
 	<div class="tab-page" id="tabSettings">
-		<h2 class="tab">[+_lang_settings_page_settings+]</h2>
+		<h2 class="tab" id="tabSettingsHeader">[+_lang_settings_page_settings+]</h2>
 		<script type="text/javascript">
 			tpSettings.addTabPage(document.getElementById('tabSettings'));
 		</script>
@@ -146,7 +146,7 @@ EOT;
 $tpl['tab-page']['meta'] = <<< EOT
 <!-- META Keywords -->
 <div class="tab-page" id="tabMeta">
-	<h2 class="tab">[+_lang_meta_keywords+]</h2>
+	<h2 class="tab" id="tabMetaHeader">[+_lang_meta_keywords+]</h2>
 	<script type="text/javascript">tpSettings.addTabPage( document.getElementById( "tabMeta" ) );</script>
 	<table width="99%" border="0" cellspacing="5" cellpadding="0">
 	<tr style="height: 24px;"><td>[+_lang_resource_metatag_help+]<br /><br />
@@ -179,7 +179,7 @@ EOT;
 $tpl['tab-page']['access'] = <<< EOT
 <!-- Access Permissions -->
 <div class="tab-page" id="tabAccess">
-	<h2 class="tab" id="tab_access_header">[+_lang_access_permissions+]</h2>
+	<h2 class="tab" id="tabAccessHeader">[+_lang_access_permissions+]</h2>
 	<script type="text/javascript">tpSettings.addTabPage( document.getElementById( "tabAccess" ) );</script>
 	<script type="text/javascript">
 		/* <![CDATA[ */
