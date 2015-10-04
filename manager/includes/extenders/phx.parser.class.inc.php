@@ -412,7 +412,7 @@ class PHx {
 				if($value!=='') $value = str_replace($s,$r,$value);
 				break;
 			case 'replace_to':
-				if($value!=='') $value = str_replace(array('[+value+]','[+output+]'),$value,$opt);
+				if($value!=='') $value = str_replace(array('[+value+]','[+output+]','{value}'),$value,$opt);
 				break;
 			case 'preg_replace':
 			case 'regex_replace':
