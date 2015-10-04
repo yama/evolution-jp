@@ -75,8 +75,6 @@ class DocumentParser {
             return $this->makeDocumentListing();
         elseif($property_name==='chunkCache')
             $this->setChunkCache();
-        elseif($property_name==='aliasListing')
-            $this->setAliasListing();
         else
             $this->logEvent(0, 1, "\$modx-&gt;{$property_name} is undefined property", 'Call undefined property');
     }
@@ -398,6 +396,8 @@ class DocumentParser {
         }
         else
         {
+            $this->setChunkCache();
+            $this->setAliasListing();
             // get document object
             $this->documentObject= $this->getDocumentObject($this->documentMethod, $this->documentIdentifier, 'prepareResponse');
             
@@ -875,6 +875,10 @@ class DocumentParser {
             $this->config['rb_base_dir']      = str_replace('[(base_path)]',MODX_BASE_PATH,$this->config['rb_base_dir']);
         if(!isset($this->config['modx_charset'])||empty($this->config['modx_charset']))
             $this->config['modx_charset'] = 'utf-8';
+        if(!defined('IN_PARSER_MODE')) {
+            $this->setChunkCache();
+            $this->setAliasListing();
+        }
         $this->invokeEvent('OnGetConfig');
         return $this->config;
     }
@@ -2186,8 +2190,6 @@ class DocumentParser {
         {
             $depth--;
             
-            if(empty($this->aliasListing)) $this->setAliasListing();
-            
             foreach ($childrenList[$id] as $childId)
             {
                 $pkey = $this->aliasListing[$childId]['alias'];
@@ -2415,7 +2417,6 @@ class DocumentParser {
             $alPath = '';
             if(empty($alias))
             {
-                if(!$this->aliasListing) $this->setAliasListing();
                 $al= $this->aliasListing[$id];
                 $alias = $id;
                 if ($this->config['friendly_alias_urls'] == 1)
@@ -2527,6 +2528,7 @@ class DocumentParser {
     function rewriteUrls($content)
     {
         if(strpos($content,'[~')===false) return $content;
+        if(!$this->aliasListing) $this->setAliasListing();
         
         if(!isset($this->referenceListing))
         {
