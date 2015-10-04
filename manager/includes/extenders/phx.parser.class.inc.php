@@ -452,6 +452,10 @@ class PHx {
                 if(!$opt) $opt = 0;
                 $value = $cmd($value,$opt);
                 break;
+            case 'max':
+            case 'min':
+                $value = $cmd(explode(',',$value));
+                break;
 			case 'addbreak':
 				$value = $this->addbreak($value);
 				break;
