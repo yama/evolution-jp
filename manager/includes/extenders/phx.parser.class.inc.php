@@ -322,6 +322,7 @@ class PHx {
 			case 'length':
 			case 'len':
 			case 'strlen':
+			case 'count_characters':
 				$value = $this->strlen($value); break;
 			case 'reverse':
 			case 'strrev':
