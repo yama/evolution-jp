@@ -638,9 +638,9 @@ class PHx {
 				break;
 			#####  Special functions 
 			case 'math':
-				$filter = preg_replace('@([a-zA-Z\n\r\t\s])@','',$opt);
-				$filter = str_replace('?',$value,$filter);
-				$value = eval('return '.$filter.';');
+				$filter = preg_replace('@([a-rt-zA-Z\n\r\t\s])@','',$opt);
+				$filter = str_replace(array('?','%s','[+value+]'),$value,$filter);
+				$value = eval("return {$filter};");
 				break;
 			case 'ifempty':
 			case '_default':
