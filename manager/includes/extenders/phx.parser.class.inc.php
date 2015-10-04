@@ -481,6 +481,10 @@ class PHx {
 		    	$value = trim($value);
 		    	$value = count(preg_split('/\s+/',$value));
 		    	break;
+			case 'urlencode':
+			case 'encode_url':
+				$value = urlencode($value);
+				break;
 			case 'nl2br':
 				if($modx->config['mce_element_format']==='html')
 					$value = nl2br($value,false);
