@@ -1190,6 +1190,7 @@ class SubParser {
 				$field_html .=  '<input type="text" id="tv'.$field_id.'" name="tv'.$field_id.'" value="'.htmlspecialchars($field_value).'" width="100" '.$field_style.' /></td></tr></table>';
 				break;
 			case "checkbox": // handles check boxes
+                $tpl = file_get_contents(MODX_CORE_PATH . 'docvars/inputform/checkbox.inc.php');
 				if(!is_array($field_value)) $field_value = explode('||',$field_value);
 				$rs = $this->ProcessTVCommand($field_elements, $field_id,'','tvform');
 				$index_list = $this->ParseInputOptions($rs);
