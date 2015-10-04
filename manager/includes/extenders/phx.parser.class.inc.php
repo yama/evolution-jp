@@ -489,6 +489,7 @@ class PHx {
 				$value = eval('return '.$filter.';');
 				break;
 			case 'ifempty':
+			case '_default':
 				if (empty($value)) $value = $opt; break;
 			case 'ifnotempty':
 				if (!empty($value)) $value = $opt; break;
