@@ -312,6 +312,8 @@ class PHx {
 			case 'strip':
 				if($opt==='') $opt = ' ';
 				$value = preg_replace('/[\n\r\t\s]+/', $opt, $value); break;
+			case 'strip_linefeeds':
+				$value = str_replace(array("\n","\r"), '', $value); break;
 			case 'notags':
 			case 'strip_tags':
 			case 'remove_html':
