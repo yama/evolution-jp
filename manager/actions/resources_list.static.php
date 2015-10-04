@@ -40,6 +40,7 @@ $in_docgrp = empty($docgrp) ? '':" OR dg.document_group IN ({$docgrp})";
 $access = $modx->config['tree_show_protected'] ? '' : sprintf("AND (1='%s' OR sc.privatemgr=0 %s)",$_SESSION['mgrRole'] , $in_docgrp);
 
 // Get child document count
+
 $from = "[+prefix+]site_content AS sc LEFT JOIN [+prefix+]document_groups AS dg ON dg.document = sc.id";
 $where = "sc.parent='{$content['id']}' {$access}";
 $rs = $modx->db->select('DISTINCT sc.id',$from,$where);
@@ -137,7 +138,7 @@ if ($numRecords > 0)
 			if($children['privatemgr']==1)
 				$iconpath = $_style['tree_folderopen_secure'];
 			else
-			$iconpath = $_style['tree_folder'];
+				$iconpath = $_style['tree_folder'];
 		}
 		
 		if( $children['type']==='reference')

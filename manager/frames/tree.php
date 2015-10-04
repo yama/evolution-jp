@@ -199,7 +199,6 @@ $esc_request = $modx->db->escape($_REQUEST);
     function toggleNode(node,indent,id,expandAll,privatenode) {
         privatenode = (!privatenode || privatenode == '0') ? '0' : '1';
         rpcNode = document.getElementById('c'+id);
-
         var rpcNodeText;
 
         var signImg = document.getElementById('s'+id);
@@ -214,7 +213,7 @@ $esc_request = $modx->db->escape($_REQUEST);
         }
         else {
             // expand
-                signImg.src = '<?php echo $_style["tree_minusnode"]; ?>';
+        	signImg.src = '<?php echo $_style["tree_minusnode"]; ?>';
 
             rpcNodeText = rpcNode.innerHTML;
 

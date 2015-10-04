@@ -199,11 +199,11 @@ class SubParser {
     		
 			$_ = array('pages','pc','smartphone','tablet','mobile');
 			foreach($_ as $uaType)
-    		{
+			{
 				$page_cache_path = MODX_BASE_PATH . "assets/cache/{$uaType}/{$filename}.pageCache.php";
         		if(is_file($page_cache_path)) unlink($page_cache_path);
 			}
-    			$modx->config['cache_type'] = '0';
+			$modx->config['cache_type'] = '0';
     		return;
     	}
     	elseif(is_string($params) && $params==='full')

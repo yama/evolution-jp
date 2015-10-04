@@ -346,7 +346,7 @@ function getParentValues($parent) {
 		}
 		
 		if(strpos($parent->content,'[*content*]')!==false)
-		$content = explode('[*content*]',$parent->content,2);
+			$content = explode('[*content*]',$parent->content,2);
 		else return array();
 		
 		$divstyle = "border:1px solid #C3C3C3;padding:1em;background-color:#f7f7f7;";
