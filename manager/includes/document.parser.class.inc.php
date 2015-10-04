@@ -443,6 +443,8 @@ class DocumentParser {
                 $template= $this->db->getObject('site_templates',"id='{$this->documentObject['template']}'");
                 if(substr($template->content,0,5)==='@FILE')
                     $template->content = $this->atBindFile($template->content);
+                elseif(substr($template->content,0,4)==='@URL')
+                    $template->content = $this->atBindUrl($template->content);
                 
                 if($template->id)
                 {
@@ -3338,6 +3340,8 @@ class DocumentParser {
         {$this->loadExtension('SubParser');return $this->sub->genToken();}
     function atBindFile($content='')
         {$this->loadExtension('SubParser');return $this->sub->atBindFile($content);}
+    function atBindUrl($content='')
+        {$this->loadExtension('SubParser');return $this->sub->atBindUrl($content);}
     function getOption($key, $default = null, $options = null, $skipEmpty = false)
         {$this->loadExtension('SubParser');return $this->sub->getOption($key, $default, $options, $skipEmpty);}
     function setOption($key, $value='')
