@@ -485,6 +485,10 @@ class PHx {
 			case 'encode_url':
 				$value = urlencode($value);
 				break;
+			case 'sha1':
+			case 'encode_sha1':
+				$value = sha1($value);
+				break;
 			case 'nl2br':
 				if($modx->config['mce_element_format']==='html')
 					$value = nl2br($value,false);
