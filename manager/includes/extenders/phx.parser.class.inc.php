@@ -237,9 +237,9 @@ class PHx {
 			case 'memberof':
 			case 'mo':
 				// Is Member Of  (same as inrole but this one can be stringed as a conditional)
-				if ($value == '&_PHX_INTERNAL_&') $value = $this->user['id'];
-				$grps = ($this->strlen($modifier_value) > 0 ) ? explode(',',$opt) :array();
-				$condition[] = intval($this->isMemberOfWebGroupByUserId($value,$grps));
+        		$userID = $modx->getLoginUserID();
+				$grps = ($this->strlen($opt) > 0 ) ? explode(',',$opt) :array();
+				$condition[] = intval($this->isMemberOfWebGroupByUserId($userID,$grps));
 				break;
 			case 'or':
 				$condition[] = '||';break;
@@ -249,7 +249,9 @@ class PHx {
 			case 'this':
 				$conditional = implode(' ',$condition);
 				$isvalid = intval(eval("return ({$conditional});"));
-				if (!$isvalid) { $value = NULL;}
+                if ($isvalid) return $this->srcValue;
+                else          return NULL;
+				break;
 			case 'then':
 				$conditional = implode(' ',$condition);
 				$isvalid = intval(eval("return ({$conditional});"));
@@ -289,21 +291,27 @@ class PHx {
 			case 'esc':
 			case 'escape':
 				$value = preg_replace('/&amp;(#[0-9]+|[a-z]+);/i', '&$1;', htmlspecialchars($value, ENT_QUOTES, $modx->config['modx_charset']));
-			$value = str_replace(array('[', ']', '`'),array('&#91;', '&#93;', '&#96;'),$value);
+		    	$value = str_replace(array('[', ']', '`'),array('&#91;', '&#93;', '&#96;'),$value);
 				break;
 			case 'strip':
-				$value = str_replace(array("\n","\r","\t","\s"), ' ', $value); break;
+				if($opt==='') $opt = ' ';
+				$value = preg_replace('/[\n\r\t\s]+/', $opt, $value); break;
 			case 'notags':
 			case 'strip_tags':
 				if($opt!=='')
 				{
 					foreach(explode(',',$opt) as $v)
 					{
+						$v = trim($v,'</> ');
 						$param[] = "<{$v}>";
 					}
 					$params = join(',',$param);
 				}
 				else $params = '';
+				if(!strpos($params,'<br>')===false) {
+					$value = preg_replace('@(<br[ /]*>)\n@','$1',$value);
+					$value = preg_replace('@<br[ /]*>@',"\n",$value);
+				}
 				$value = strip_tags($value,$params);
 				break;
 			case 'length':
@@ -369,7 +377,6 @@ class PHx {
 				else
 					$value = nl2br($value);
 				break;
-			
 			// These are all straight wrappers for PHP functions
 			case 'ucfirst':
 			case 'lcfirst':
