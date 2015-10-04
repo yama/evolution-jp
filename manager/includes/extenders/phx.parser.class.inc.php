@@ -456,6 +456,11 @@ class PHx {
             case 'min':
                 $value = $cmd(explode(',',$value));
                 break;
+            case 'floor':
+            case 'ceil':
+            case 'abs':
+                $value = $cmd($value);
+                break;
 			case 'addbreak':
 				$value = $this->addbreak($value);
 				break;
