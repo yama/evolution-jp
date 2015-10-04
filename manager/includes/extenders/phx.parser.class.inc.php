@@ -683,6 +683,14 @@ class PHx {
 				$ph['value'] = $value;
 				$value = $modx->parseText($tpl,$ph);
 				break;
+			case 'youtube':
+			case 'youtube16x9':
+				if(empty($opt)) $opt = 560;
+				$h = round($opt*0.5625);
+				$tpl = '<iframe width="%s" height="%s" src="https://www.youtube.com/embed/%s" frameborder="0" allowfullscreen></iframe>';
+				$value = sprintf($tpl,$opt,$h,$value);
+				break;
+			//case 'youtube4x3':%s*0.75＋25
 			// If we haven't yet found the modifier, let's look elsewhere
 			default:
 				$value = $this->getValueFromElement($phxkey, $value, $cmd, $opt);
