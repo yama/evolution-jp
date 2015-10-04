@@ -301,6 +301,11 @@ class PHx {
 			case 'encode_js':
 				$value = $modx->db->escape($value);
 				break;
+			case 'htmlspecialchars':
+			case 'hsc':
+			case 'encode_html':
+				$value = preg_replace('/&amp;(#[0-9]+|[a-z]+);/i', '&$1;', htmlspecialchars($value, ENT_QUOTES, $modx->config['modx_charset']));
+				break;
 			case 'strip':
 				if($opt==='') $opt = ' ';
 				$value = preg_replace('/[\n\r\t\s]+/', $opt, $value); break;
