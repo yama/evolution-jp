@@ -420,6 +420,10 @@ class PHx {
 				list($s,$r) = explode(',',$opt,2);
 				if($value!=='') $value = preg_replace($s,$r,$value);
 				break;
+			case 'sprintf':
+			case 'string_format':
+				if($value!=='') $value = sprintf($opt,$value);
+				break;
 			case 'cat':
 			case '.':
 				if($value!=='') $value = $value . $opt;
