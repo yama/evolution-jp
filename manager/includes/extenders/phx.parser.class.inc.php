@@ -231,6 +231,7 @@ class PHx {
 			case 'find':
 				$condition[] = intval(strpos($value, $opt)!==false);break;
 			case 'preg':
+			case 'preg_match':
 				$condition[] = intval(preg_match($opt,$value));break;
 			case 'isinrole':
 			case 'ir':
