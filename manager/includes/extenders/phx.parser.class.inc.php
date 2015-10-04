@@ -414,6 +414,12 @@ class PHx {
 			case 'replace_to':
 				if($value!=='') $value = str_replace(array('[+value+]','[+output+]'),$value,$opt);
 				break;
+			case 'preg_replace':
+			case 'regex_replace':
+				if(empty($opt) || strpos($opt,',')===false) break;
+				list($s,$r) = explode(',',$opt,2);
+				if($value!=='') $value = preg_replace($s,$r,$value);
+				break;
 			case 'cat':
 			case '.':
 				if($value!=='') $value = $value . $opt;
