@@ -19,6 +19,7 @@ class Mysqldumper {
 	var $database_server;
 	var $dbname;
 	var $table_prefix;
+	var $contentsOnly;
 
 	function Mysqldumper() {
 		global $modx;
@@ -104,6 +105,10 @@ class Mysqldumper {
 					case "{$table_prefix}site_htmlsnippets":
 					case "{$table_prefix}site_templates":
 					case "{$table_prefix}system_settings":
+					case "{$table_prefix}site_tmplvars":
+					case "{$table_prefix}site_tmplvar_access":
+					case "{$table_prefix}site_tmplvar_contentvalues":
+					case "{$table_prefix}site_tmplvar_templates":
 						break;
 					default:
 						continue 2;
@@ -146,6 +151,28 @@ class Mysqldumper {
 		if(empty($output)) return false;
 		else unlink($tempfile_path);
 		return $output;
+	}
+	
+	function convertValues($row)
+	{
+		switch($row['setting_name'])
+		{
+			case 'filemanager_path':
+			case 'rb_base_dir':
+			case 'sys_files_checksum':
+			if(strpos($row['setting_value'],MODX_BASE_PATH)!==false)
+				$row['setting_value'] = str_replace(MODX_BASE_PATH,'[(base_path)]',$row['setting_value']);
+    			break;
+			case 'site_url':
+			if($row['setting_value']===MODX_SITE_URL)
+				$row['setting_value'] = '[(site_url)]';
+    			break;
+			case 'base_url':
+			if($row['setting_value']===MODX_BASE_URL)
+				$row['setting_value'] = '[(base_url)]';
+    			break;
+		}
+		return $row;
 	}
 	
 	// Private function object2Array.

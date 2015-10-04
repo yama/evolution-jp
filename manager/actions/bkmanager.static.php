@@ -338,6 +338,10 @@ if(isset($_SESSION['last_result']) || !empty($_SESSION['last_result']))
 	<form method="post" name="snapshot" action="index.php">
 	<input type="hidden" name="a" value="307" />
 	<input type="hidden" name="mode" value="snapshot" />
+	<table>
+	<tr><th><?php echo $_lang["bk.contentOnly"];?></th><td><input type="checkbox" name="contentsOnly" value="1" /></td></tr>
+	<tr><th><?php echo $_lang["bk.fileName"];?></th><td><input type="text" name="file_name" size="50" value="<?php echo $filename;?>" /></td></tr>
+	</table>
 	<div class="actionButtons" style="margin-top:10px;margin-bottom:10px;">
 	<a href="#" class="primary" onclick="nanobar.go(30);document.snapshot.save.click();"><img alt="icons_save" src="<?php echo $_style["icons_add"]?>" /><?php echo $_lang["bkmgr_snapshot_submit"];?></a>
 	<input type="submit" name="save" style="display:none;" />

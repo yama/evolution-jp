@@ -1309,3 +1309,6 @@ $_lang["setting_individual_cache_desc"] = 'デバイスごとにキャッシュ�
 
 $_lang["logtitle_login_disp_warning"] = 'ログイン画面の表示に問題あり';
 $_lang["logmsg_login_disp_warning"] = 'プラグインを一時的に無効にしました。';
+
+$_lang["bk.contentOnly"] = 'コンテンツデータのみ';
+$_lang["bk.fileName"] = 'ファイル名';
