@@ -1708,7 +1708,7 @@ class DocumentParser {
         return $echo . $return;
     }
     
-    function evalSnippets($content)
+    function evalSnippets($content,$nest=0)
     {
         if(strpos($content,'[[')===false) return $content;
         
@@ -1721,6 +1721,33 @@ class DocumentParser {
         $replace= array ();
         foreach($matches[1] as $i=>$value)
         {
+            if(substr($value,0,2)==='$_')
+            {
+                $key = $value;
+                if(strpos($key,':')!==false)
+                    list($key,$modifiers) = explode(':', $key, 2);
+                else $modifiers = false;
+                $key = str_replace(array('(',')'),array("['","']"),$key);
+                if(strpos($key,'$_SESSION')!==false)
+                {
+                    $_ = $_SESSION;
+                    $key = str_replace('$_SESSION','$_',$key);
+                    if(isset($_['mgrFormValues'])) unset($_['mgrFormValues']);
+                    if(isset($_['token'])) unset($_['token']);
+                }
+                if(strpos($key,'[')!==false)
+                    $value = eval("return {$key};");
+                elseif(0<eval("return count({$key});"))
+                    $value = eval("return print_r({$key},true);");
+                else $value = '';
+                if($modifiers!==false)
+                {
+                    $this->loadExtension('PHx') or die('Could not load PHx class.');
+                    $value = $this->filter->phxFilter($key,$value,$modifiers);
+                }
+                $replace[$i] = $value;
+                continue;
+            }
             foreach($matches[0] as $find=>$tag)
             {
                 if(isset($replace[$find]) && strpos($value,$tag)!==false)
@@ -1844,13 +1871,33 @@ class DocumentParser {
         return $params;
     }
     
+    function _findSplitter($str) {
+        $str = str_split($str);
+        $pass = false;
+        $i = -1;
+        $pos = false;
+        $inFilter = false;
+        foreach($str as $c) {
+            $i++;
+            if($inFilter)    {
+                if($c===')')     { $pass = false; continue; }
+                elseif($pass)    { continue; }
+                elseif($c==='(') { $pass=true; continue; }
+                elseif($c==='?') { $pos=$i; break; }
+            }
+            elseif($c===':')     { $inFilter=true; }
+            elseif($c==='?')     { $pos = $i; break; }
+        }
+        return $pos;
+    }
+    
     private function _split_snip_call($call)
     {
         $spacer = md5('dummy');
         if(strpos($call,']]>')!==false)
             $call = str_replace(']]>', "]{$spacer}]>",$call);
         
-        $pos['?']  = strpos($call, '?');
+        $pos['?']  = $this->_findSplitter($call);
         $pos['&']  = strpos($call, '&');
         $pos['=']  = strpos($call, '=');
         $pos['lf'] = strpos($call, "\n");
@@ -1861,8 +1908,10 @@ class DocumentParser {
                 list($name,$params) = explode('?',$call,2);
             elseif($pos['lf']!==false && $pos['lf'] < $pos['?'])
                 list($name,$params) = explode("\n",$call,2);
-            else
-                list($name,$params) = explode('?',$call,2);
+            else {
+                $name   = substr($call, 0, $pos['?']);
+                $params = substr($call, $pos['?']+1);
+            }
         }
         elseif($pos['&'] !== false && $pos['='] !== false && $pos['?'] === false)
             list($name,$params) = explode('&',$call,2);
