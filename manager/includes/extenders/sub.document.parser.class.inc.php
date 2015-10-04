@@ -1285,7 +1285,9 @@ class SubParser {
                 $custom_output = str_replace(array_keys($replacements), $replacements, $custom_output);
                 if(isset($content['id']))
                 {
-                	if(!isset($modx->getDocumentObject))
+                    global $docObject;
+                    if($docObject) $modx->documentObject = $docObject;
+                	elseif(!isset($modx->getDocumentObject))
                 		$modx->documentObject = $modx->getDocumentObject('id',$content['id']);
                 	if(!isset($modx->documentIdentifier))
                 		$modx->documentIdentifier = $content['id'];
