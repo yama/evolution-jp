@@ -1548,6 +1548,8 @@ class DocumentParser {
                     case '[*':
                     case '[[':
                     case '[!':
+                    case '[(':
+                    case '{{':
                         if(strpos($cmd,'[!')!==false)
                             $cmd = str_replace(array('[!','!]'),array('[[',']]'),$cmd);
                         $cmd = $this->parseDocumentSource($cmd);
