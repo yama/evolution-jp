@@ -117,7 +117,7 @@ function getNodes($indent,$parent=0,$expandAll,$output='')
 		$ph['deleted']   = $deleted;
 		$ph['nodetitleDisplay'] = '<span class="' . $class . '">' . $nodetitle . '</span>';
 		$ph['weblinkDisplay']   = $type==='reference' ? '&nbsp;<img src="'.$_style["tree_linkgo"].'">' : '' ;
-		$ph['pageIdDisplay']    = '<small>('.($modx_textdir==='rtl' ? '&rlm;':'').$id.')</small>';
+		$ph['pageIdDisplay']    = '<span>('.($modx_textdir==='rtl' ? '&rlm;':'').$id.')</span>';
 		$ph['_lang_click_to_context'] = $_lang['click_to_context'];
 		
 		if (!$isfolder)
@@ -215,7 +215,7 @@ function tplPageNode()
 	id="node[+id+]"
 	p="[+parent+]"
 	style="white-space: nowrap;"
->[+spacer+][+pad+]<img
+><div>[+spacer+][+pad+]<img
 	id="p[+id+]"
 	align="absmiddle"
 	title="[+_lang_click_to_context+]"
@@ -234,7 +234,7 @@ function tplPageNode()
 	class="treeNode"
 	onmousedown="itemToChange=[+id+]; selectedObjectName=[+pagetitle+]; selectedObjectDeleted=[+deleted+]; selectedObjectUrl=[+url+];"
 	oncontextmenu="document.getElementById([+pid+]).onclick(event);return false;"
-	title="[+alt+]">[+nodetitleDisplay+][+weblinkDisplay+]</span> [+pageIdDisplay+]</div>
+	title="[+alt+]">[+nodetitleDisplay+][+weblinkDisplay+]</span> [+pageIdDisplay+]</div></div>
 
 EOT;
 		return $src;
@@ -243,7 +243,7 @@ EOT;
 	function getFopenNode()
 	{
 		$src = <<< EOT
-<div id="node[+id+]" p="[+parent+]" style="white-space: nowrap;">[+spacer+]<img
+<div id="node[+id+]" p="[+parent+]" style="white-space: nowrap;"><div>[+spacer+]<img
 	id="s[+id+]"
 	align="absmiddle"
 	style="cursor:pointer"
@@ -269,7 +269,7 @@ EOT;
 	onmousedown="itemToChange=[+id+]; selectedObjectName=[+pagetitle+]; selectedObjectDeleted=[+deleted+]; selectedObjectUrl=[+url+];"
 	oncontextmenu="document.getElementById([+fid+]).onclick(event);return false;"
 	title="[+alt+]"
->[+nodetitleDisplay+][+weblinkDisplay+]</span> [+pageIdDisplay+]<div style="display:block">
+>[+nodetitleDisplay+][+weblinkDisplay+]</span> [+pageIdDisplay+]</div><div id="c[+id+]" style="display:block;">
 
 EOT;
 	return $src;
@@ -278,7 +278,7 @@ EOT;
 function tplFcloseNode()
 {
 	$src = <<< EOT
-<div id="node[+id+]" p="[+parent+]" style="white-space: nowrap;">[+spacer+]<img
+<div id="node[+id+]" p="[+parent+]" style="white-space: nowrap;"><div>[+spacer+]<img
 	id="s[+id+]"
 	align="absmiddle"
 	style="cursor: pointer"
@@ -303,7 +303,8 @@ function tplFcloseNode()
 	class="treeNode"
 	onmousedown="itemToChange=[+id+]; selectedObjectName=[+pagetitle+]; selectedObjectDeleted=[+deleted+]; selectedObjectUrl=[+url+];"
 	oncontextmenu="document.getElementById([+fid+]).onclick(event);return false;"
-	title="[+alt+]">[+nodetitleDisplay+][+weblinkDisplay+]</span> [+pageIdDisplay+]<div style="display:none"></div></div>
+	title="[+alt+]"
+>[+nodetitleDisplay+][+weblinkDisplay+]</span> [+pageIdDisplay+]</div><div id="c[+id+]" style="display:none;"></div></div>
 
 EOT;
 	return $src;
