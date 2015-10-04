@@ -472,6 +472,11 @@ class PHx {
 				}
 				$value = join(' ',$_);
 				break;
+		    case 'count_paragraphs':
+		    	$value = trim($value);
+		    	$value = preg_replace('/\r/', '', $value);
+		    	$value = count(preg_split('/\n+/',$value));
+		    	break;
 			case 'nl2br':
 				if($modx->config['mce_element_format']==='html')
 					$value = nl2br($value,false);
