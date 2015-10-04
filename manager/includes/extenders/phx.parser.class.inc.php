@@ -691,6 +691,18 @@ class PHx {
 				$value = sprintf($tpl,$opt,$h,$value);
 				break;
 			//case 'youtube4x3':%s*0.75＋25
+			case 'datagrid':
+                include_once(MODX_CORE_PATH . 'controls/datagrid.class.php');
+                $grd = new DataGrid();
+                $grd->ds = trim($value);
+                $grd->itemStyle = '';
+                $grd->altItemStyle = '';
+                $pos = strpos($value,"\n");
+                if($pos) $_ = substr($value,0,$pos);
+                else $_ = $pos;
+                $grd->cdelim = strpos($_,"\t")!==false ? 'tab' : ',';
+                $value = $grd->render();
+                break;
 			// If we haven't yet found the modifier, let's look elsewhere
 			default:
 				$value = $this->getValueFromElement($phxkey, $value, $cmd, $opt);
