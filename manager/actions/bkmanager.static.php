@@ -329,6 +329,14 @@ if(isset($_SESSION['last_result']) || !empty($_SESSION['last_result']))
 	if(isset($result)) echo '<div style="margin-top:20px;"><p style="font-weight:bold;"><?php echo $_lang["bkmgr_run_sql_result"];?></p>' . $result . '</div>';
 ?>
 </div>
+<?php
+    $today = $modx->toDateFormat($_SERVER['REQUEST_TIME']);
+    $today = str_replace(array('/',' '), '-', $today);
+    $today = str_replace(':', '', $today);
+    $today = strtolower($today);
+    global $modx_version;
+    $filename = "{$today}-{$modx_version}.sql";
+?>
 
 <div class="tab-page" id="tabSnapshot">
 	<h2 class="tab"><?php echo $_lang["bkmgr_snapshot_title"];?></h2>
@@ -369,9 +377,15 @@ if(is_array($files) && 0 < $total)
 	$tpl = '<li>[+filename+] ([+filesize+]) (<a href="#" onclick="nanobar.go(30);document.restore2.filename.value=\'[+filename+]\';document.restore2.save.click()">' . $_lang["bkmgr_restore_submit"] . '</a>)</li>' . "\n";
 	while ($file = array_shift($files))
 	{
+		$timestamp = filemtime($file);
 		$filename = substr($file,strrpos($file,'/')+1);
 		$filesize = $modx->nicesize(filesize($file));
-		echo str_replace(array('[+filename+]','[+filesize+]'),array($filename,$filesize),$tpl);
+		$output[$timestamp] = str_replace(array('[+filename+]','[+filesize+]'),array($filename,$filesize),$tpl);
+	}
+	krsort($output);
+	foreach($output as $v)
+	{
+		echo $v;
 	}
 	echo '</ul>';
 }
