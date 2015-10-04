@@ -477,6 +477,10 @@ class PHx {
 		    	$value = preg_replace('/\r/', '', $value);
 		    	$value = count(preg_split('/\n+/',$value));
 		    	break;
+		    case 'count_words':
+		    	$value = trim($value);
+		    	$value = count(preg_split('/\s+/',$value));
+		    	break;
 			case 'nl2br':
 				if($modx->config['mce_element_format']==='html')
 					$value = nl2br($value,false);
