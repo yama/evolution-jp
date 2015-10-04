@@ -2,11 +2,10 @@
 /*####
 #
 #	Name: PHx class(Placeholders Xtended)
-#	Version: 2.2
 #	Author: Armand "bS" Pondman (apondman@zerobarrier.nl)
 #	Modified by Nick to include external files
 #	Modified by yama yamamoto@kyms.jp
-#	Date: 2012/07/28
+#	Date: 2015/03/24
 #
 ####*/
 
@@ -14,10 +13,14 @@ class PHx {
 	
 	var $placeholders = array();
 	var $vars = array();
+	var $cache = array();
+	var $bt;
+    var $srcValue;
 	
 	function PHx()
 	{
 		global $modx;
+		
 		if (function_exists('mb_internal_encoding')) mb_internal_encoding($modx->config['modx_charset']);
 		$this->placeholders['phx'] = '';
 	}
@@ -25,10 +28,11 @@ class PHx {
 	function phxFilter($key,$value,$modifiers)
 	{
 		global $modx;
-		
+        $this->srcValue = $value;
+		$modifiers = str_replace(array("\r\n","\r"), "\n", $modifiers);
 		$modifiers = $this->splitModifiers($modifiers);
 		$this->vars = array();
-		$this->vars['name']    = & $phxkey;
+		$this->vars['name']    = & $key;
 		$value = $this->parsePhx($key,$value,$modifiers);
 		$this->vars = array();
 		return $value;
@@ -47,20 +51,36 @@ class PHx {
 		while($modifiers!=='')
 		{
 			$bt = $modifiers;
-			$char = substr($modifiers,0,1);
-			$modifiers = substr($modifiers,1);
+			$char = $this->substr($modifiers,0,1);
+			$modifiers = $this->substr($modifiers,1);
 			
 			if($key===''&&$char==='=') exit('PHx parse error');
 			
 			if    ($char==='=')
 			{
-		    	$nextchar = substr($modifiers,0,1);
+		    	$nextchar = $this->substr($modifiers,0,1);
 				if(in_array($nextchar, array('"', "'", '`'))) list($value,$modifiers) = $this->_delimRoop($modifiers,$nextchar);
 		    	elseif(strpos($modifiers,':')!==false)        list($value,$modifiers) = explode(':', $modifiers, 2);
 		    	else                                          list($value,$modifiers) = array($modifiers,'');
 			}
 			elseif($char==='(' && strpos($modifiers,')')!==false)
-				list($value,$modifiers) = explode(')', $modifiers, 2);
+			{
+				$delim = $this->substr($modifiers,0,1);
+				switch($delim)
+				{
+					case '"':
+					case "'":
+					case '`':
+						if(strpos($modifiers,"{$delim})")!==false)
+					    {
+							list($value,$modifiers) = explode("{$delim})", $modifiers, 2);
+							$value = substr($value,1);
+						}
+						break;
+					default:
+						list($value,$modifiers) = explode(')', $modifiers, 2);
+				}
+			}
 			elseif($char===':') $value = '';
 			else                $key .= $char;
 			
@@ -72,6 +92,8 @@ class PHx {
     	    	$key   = '';
     	    	$value = null;
 			}
+			elseif($key!==''&&$modifiers==='')
+				$result[]=array('cmd'=>$key,'opt'=>'');
 			
 			if($modifiers===$bt)
 			{
@@ -85,8 +107,8 @@ class PHx {
 		
 		foreach($result as $i=>$a)
 		{
-			$result[$i]['opt'] = $this->parseDocumentSource($a['opt']);
-			$result[$i]['opt'] = $modx->parseText($a['opt'],$this->placeholders);
+            $a['opt'] = $this->parseDocumentSource($a['opt']);
+            $result[$i]['opt'] = $modx->parseText($a['opt'],$this->placeholders,'[+','+]',false);
 		}
 		
 		return $result;
@@ -98,6 +120,18 @@ class PHx {
 		if(empty($modifiers)) return;
 		
 		$condition = array();
+
+		foreach($modifiers as $m)
+		{
+			$lastKey = $m['cmd'];
+		}
+		$_ = explode(',','equals,is,eq,notequals,isnot,isnt,ne,isgreaterthan,isgt,eg,islowerthan,islt,el,greaterthan,gt,lowerthan,lt,find,preg');
+		if(in_array($lastKey,$_))
+		{
+			$modifiers[] = array('cmd'=>'then','opt'=>'1');
+			$modifiers[] = array('cmd'=>'else','opt'=>'0');
+		}
+		
 		foreach($modifiers as $i=>$a)
 		{
 			if ($modx->debug) $fstart = $modx->getMicroTime();
@@ -117,13 +151,15 @@ class PHx {
 		if(preg_match('@^[1-9][/0-9]*$@',$cmd))
 		{
 			if(strpos($cmd,'/')!==false)
-				$cmd = substr($cmd,strrpos($cmd,'/')+1);
+				$cmd = $this->substr($cmd,strrpos($cmd,'/')+1);
 			$opt = $cmd;
 			$cmd = 'id';
 		}
 		
 		$this->elmName = '';
-		if(!$modx->snippetCache) $modx->setSnippetCache();
+		if(!$modx->snippetCache)  $modx->setSnippetCache();
+		if(!$modx->chunkCache) $modx->setChunkCache();
+		
 		if(isset($modx->snippetCache["phx:{$cmd}"])) {
 			$this->elmName = "phx:{$cmd}";
 		}
@@ -147,9 +183,20 @@ class PHx {
 		return $value;
 	}
 	
+	function isEmpty($cmd,$value)
+	{
+		if($value!=='') return false;
+		
+		$_ = explode(',', 'id,ifempty,input,if,equals,is,eq,notequals,isnot,isnt,ne,find,preg,or,and,show,this,then,else,select,switch,summary,smart_description,smart_desc,isinrole,ir,memberof,mo');
+		if(in_array($cmd,$_)) return false;
+		else                  return true;
+	}
+	
 	function getValueFromPreset($phxkey, $value, $cmd, $opt)
 	{
 		global $modx, $condition;
+		
+		if($this->isEmpty($cmd,$value)) return;
 		
 		switch ($cmd)
 		{
@@ -526,14 +573,14 @@ class PHx {
 			else                                     $input  = $value;
 			if($modx->config['output_filter']==='1') $name   = $phxkey;
 			else                                     $key    = $phxkey;
-			$bt = $value;
+			$this->bt = $value;
 			$this->vars['value']   = & $value;
 			$this->vars['input']   = & $value;
 			$this->vars['option']  = & $opt;
 			$this->vars['options'] = & $opt;
 			$custom = eval($php);
 			$msg = ob_get_contents();
-			if($value===$bt) $value = $msg . $custom;
+			if($value===$this->bt) $value = $msg . $custom;
 			ob_end_clean();
 		}
 		elseif($html!==false && isset($value) && $value!=='')
@@ -550,7 +597,7 @@ class PHx {
 	}
 	// Returns the specified field from the user record
 	// positive userid = manager, negative integer = webuser
-	function ModUser($userid,$field,$fuzzy=false) {
+	function ModUser($userid,$field) {
 		global $modx;
 		if (!isset($this->cache['ui']) || !array_key_exists($userid, $this->cache['ui'])) {
 			if (intval($userid) < 0) {
@@ -564,24 +611,7 @@ class PHx {
 		}
 		$user['name'] = !empty($user['fullname']) ? $user['fullname'] : $user['fullname'];
 		
-		if($fuzzy)
-		{
-			switch($field)
-			{
-				case 'lastlogin':
-				case 'thislogin':
-				case 'dob':
-				case 'blockeduntil':
-				case 'blockedafter':
-					$value = $modx->toDateFormat($user[$field]);
-					break;
-				default:
-					$value = $user[$field];
-			}
-		}
-		else $value = $user[$field];
-		
-		return $value;
+		return $user[$field];
 	}
 	 
 	 // Returns true if the user id is in one the specified webgroups
@@ -595,14 +625,13 @@ class PHx {
 		if (intval($userid) < 0) { $userid = -($userid); }
 		
 		// Creates an array with all webgroups the user id is in
-		if (!array_key_exists($userid, $this->cache['mo']))
+		if (isset($this->cache['mo'][$userid])) $grpNames = $this->cache['mo'][$userid];
+		else
 		{
-			$tbl_webgroup_names = $modx->getFullTableName('webgroup_names');
-			$tbl_web_groups     = $modx->getFullTableName('web_groups');
-			$sql = "SELECT wgn.name FROM {$tbl_webgroup_names} wgn INNER JOIN {$tbl_web_groups} wg ON wg.webgroup=wgn.id AND wg.webuser='{$userid}'";
-			$this->cache['mo'][$userid] = $grpNames = $modx->db->getColumn('name',$sql);
+			$from = sprintf("[+prefix+]webgroup_names wgn INNER JOIN [+prefix+]web_groups wg ON wg.webgroup=wgn.id AND wg.webuser='%s'",$userid);
+			$rs = $modx->db->select('wgn.name',$from);
+			$this->cache['mo'][$userid] = $grpNames = $modx->db->getColumn('name',$rs);
 		}
-		else $grpNames = $this->cache['mo'][$userid];
 		
 		// Check if a supplied group matches a webgroup from the array we just created
 		foreach($groupNames as $k=>$v)
@@ -616,17 +645,23 @@ class PHx {
 	
 	function _delimRoop($_tmp,$delim)
 	{
-		$_tmp = substr($_tmp,1);
+		$debugbt = $_tmp;
+		$_tmp = $this->substr($_tmp,1);
 		$value = '';
 		$c = 0;
 		while($c < 65000)
 		{
 			$bt = $_tmp;
-			$char = substr($_tmp,0,1);
-			$_tmp = substr($_tmp,1);
+			$char = $this->substr($_tmp,0,1);
+			$_tmp = $this->substr($_tmp,1);
 			$c++;
-			if($c===65000) exit('phx parse over');
-			if($char===$delim && (substr($_tmp,0,1)===':'))
+			if($c===65000)
+			{
+				global $modx;
+				$modx->addLog('PHx _delimRoop debug',$debugbt);
+				exit('phx parse over');
+			}
+			if($char===$delim && ($this->substr($_tmp,0,1)===':'))
 				break;
 			else
 				$value .= $char;
@@ -656,8 +691,8 @@ class PHx {
 			if(strpos($content,'{{')!==false) $content = $modx->mergeChunkContent($content);
 			if(strpos($content,'[[')!==false) $content = $modx->evalSnippets($content);
 			if($content===$bt) break;
-			if($c===1000) exit('Parse over');
 			$c++;
+			if($c===20) exit('Parse over');
 		}
 		return $content;
 	}
@@ -708,11 +743,24 @@ class PHx {
 	
 	//mbstring
 	function substr($str, $s, $l = null) {
-		if (function_exists('mb_substr')) return mb_substr($str, $s, $l);
+		global $modx;
+		if(is_null($l)) $l = $this->strlen($str);
+		if (function_exists('mb_substr'))
+		{
+			if(strpos($str,"\r")!==false)
+				$str = str_replace(array("\r\n","\r"), "\n", $str);
+			return mb_substr($str, $s, $l, $modx->config['modx_charset']);
+		}
 		return substr($str, $s, $l);
 	}
+	function strpos($haystack,$needle,$offset=0) {
+		global $modx;
+		if (function_exists('mb_strpos')) return mb_strpos($haystack,$needle,$offset,$modx->config['modx_charset']);
+		return $this->strlen($haystack,$needle,$offset);
+	}
 	function strlen($str) {
-		if (function_exists('mb_strlen')) return mb_strlen($str);
+		global $modx;
+		if (function_exists('mb_strlen')) return mb_strlen(str_replace("\r\n", "\n", $str),$modx->config['modx_charset']);
 		return strlen($str);
 	}
 	function strtolower($str) {
@@ -724,13 +772,13 @@ class PHx {
 		return strtoupper($str);
 	}
 	function ucfirst($str) {
-		if (function_exists('mb_strtoupper') && function_exists('mb_substr') && function_exists('mb_strlen')) 
-			return mb_strtoupper(mb_substr($str, 0, 1)).mb_substr($str, 1, mb_strlen($str));
+		if (function_exists('mb_strtoupper')) 
+			return mb_strtoupper($this->substr($str, 0, 1)).$this->substr($str, 1, $this->strlen($str));
 		return ucfirst($str);
 	}
 	function lcfirst($str) {
-		if (function_exists('mb_strtolower') && function_exists('mb_substr') && function_exists('mb_strlen')) 
-			return mb_strtolower(mb_substr($str, 0, 1)).mb_substr($str, 1, mb_strlen($str));
+		if (function_exists('mb_strtolower')) 
+			return mb_strtolower($this->substr($str, 0, 1)).$this->substr($str, 1, $this->strlen($str));
 		return lcfirst($str);
 	}
 	function ucwords($str) {
@@ -755,22 +803,74 @@ class PHx {
     {
         global $modx;
         
-        if(isset($modx->documentObject['richtext'])&&$modx->documentObject['richtext']==1)
-            return $text;
-        
         $text = $this->parseDocumentSource($text);
+        $text = str_replace(array("\r\n","\r"),"\n",$text);
         
         $blockElms  = 'br,table,tbody,tr,td,th,thead,tfoot,caption,colgroup,div';
         $blockElms .= ',dl,dd,dt,ul,ol,li,pre,select,option,form,map,area,blockquote';
         $blockElms .= ',address,math,style,input,p,h1,h2,h3,h4,h5,h6,hr,object,param,embed';
+        $blockElms .= ',noframes,noscript,section,article,aside,hgroup,footer,address,code';
         $blockElms = explode(',', $blockElms);
         $lines = explode("\n",$text);
+        $c = count($lines);
         foreach($lines as $i=>$line)
         {
             $line = rtrim($line);
-            if(!preg_match("@</?{$blocks}" . '[^>]*>$@',$line))
-                $lines[$i] = "${line}<br />";
+            if($i===$c-1) break;
+            foreach($blockElms as $block)
+            {
+                if(preg_match("@</?{$block}" . '[^>]*>$@',$line))
+                    continue 2;
+            }
+            $lines[$i] = "{$line}<br />";
         }
         return join("\n", $lines);
     }
- }
+    
+    function getSummary($content='', $limit=100, $delim='')
+    {
+    	global $modx;
+    	if($delim==='') $delim = $modx->config['manager_language']==='japanese-utf8' ? '。' : '.';
+    	$limit = intval($limit);
+    	
+    	if($content==='' && isset($modx->documentObject['content']))
+    		$content = $modx->documentObject['content'];
+    	
+    	$content = $this->parseDocumentSource($content);
+    	$content = strip_tags($content);
+    	$content = str_replace(array("\r\n","\r","\n","\t",'&nbsp;'),' ',$content);
+    	if(preg_match('/\s+/',$content))
+    		$content = preg_replace('/\s+/',' ',$content);
+    	$content = trim($content);
+    	
+    	$pos = $this->strpos($content, $delim);
+    	
+    	if($pos!==false && $pos<$limit)
+    	{
+    		$_ = explode($delim, $content);
+    		$text = '';
+    		foreach($_ as $value)
+    		{
+    			if($limit <= $this->strlen($text.$value.$delim)) break;
+    			$text .= $value.$delim;
+    		}
+    	}
+    	else $text = $content;
+    	
+    	if($limit<$this->strlen($text) && strpos($text,' ')!==false)
+    	{
+    		$_ = explode(' ', $text);
+    		$text = '';
+    		foreach($_ as $value)
+    		{
+    			if($limit <= $this->strlen($text.$value.' ')) break;
+    			$text .= $value . ' ';
+    		}
+    		if($text==='') $text = $content;
+    	}
+    	
+    	if($limit < $this->strlen($text)) $text = $this->substr($text, 0, $limit);
+    	
+    	return $text;
+    }
+}
