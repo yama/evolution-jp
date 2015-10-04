@@ -280,6 +280,7 @@ class PHx {
 			#####  String Modifiers
 			case 'lcase':
 			case 'strtolower':
+			case 'lower_case':
 				$value = $this->strtolower($value); break;
 			case 'ucase':
 			case 'strtoupper':
