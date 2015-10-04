@@ -284,6 +284,7 @@ class PHx {
 				$value = $this->strtolower($value); break;
 			case 'ucase':
 			case 'strtoupper':
+			case 'upper_case':
 				$value = $this->strtoupper($value); break;
 			case 'htmlent':
 			case 'htmlentities':
