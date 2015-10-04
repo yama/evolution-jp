@@ -10,14 +10,14 @@ if(isset($_REQUEST['id'])&&preg_match('@^[1-9][0-9]*$@',$_REQUEST['id']))
 else
 {
     $rs = $modx->db->select('id','[+prefix+]site_content','deleted=1');
-$ids = array();
-if($modx->db->getRecordCount($rs)>0)
-{
-	while($row=$modx->db->getRow($rs))
-	{
+    $ids = array();
+    if($modx->db->getRecordCount($rs)>0)
+    {
+    	while($row=$modx->db->getRow($rs))
+    	{
     		$ids[] = $row['id'];
-	}
-}
+    	}
+    }
 }
 
 // invoke OnBeforeEmptyTrash event
