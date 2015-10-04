@@ -472,7 +472,7 @@ class PHx {
 			case 'fax':
 			case 'photo':
 			case 'comment':
-				$value = $this->ModUser($value,$cmd,'fuzzy');
+				$value = $this->ModUser($value,$cmd);
 				break;
 			#####  Special functions 
 			case 'math':
