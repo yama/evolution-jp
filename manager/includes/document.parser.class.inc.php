@@ -550,8 +550,8 @@ class DocumentParser {
         {
             $matches= array ();
             $matches = $this->getTagsFromContent($this->documentOutput,'[+','+]');
-            if ($matches['0'])
-            $this->documentOutput= str_replace($matches['0'], '', $this->documentOutput);
+            if ($matches[0])
+            $this->documentOutput= str_replace($matches[0], '', $this->documentOutput);
         }
         
         if(strpos($this->documentOutput,'[~')!==false) $this->documentOutput = $this->rewriteUrls($this->documentOutput);
@@ -1263,7 +1263,7 @@ class DocumentParser {
         if(!$matches) return $content;
         
         $replace= array ();
-        foreach($matches['1'] as $i=>$key):
+        foreach($matches[1] as $i=>$key):
             $key= substr($key, 0, 1) == '#' ? substr($key, 1) : $key; // remove # for QuickEdit format
             
             if(strpos($key,':')!==false && $this->config['output_filter']!=='0')
@@ -1320,10 +1320,10 @@ class DocumentParser {
             }
             $replace[$i]= $value;
         endforeach;
-            $content= str_replace($matches['0'], $replace, $content);
+            $content= str_replace($matches[0], $replace, $content);
         if ($this->debug)
         {
-            $_ = join(', ', $matches['0']);
+            $_ = join(', ', $matches[0]);
             $this->addLogEntry('$modx->'.__FUNCTION__ . "[{$_}]",$fstart);
         }
         return $content;
@@ -1347,7 +1347,7 @@ class DocumentParser {
         if(!$matches) return $content;
         
         $replace= array ();
-        foreach($matches['1'] as $i=>$key):
+        foreach($matches[1] as $i=>$key):
             if(strpos($key,':')!==false && $this->config['output_filter']!=='0')
                 list($key,$modifiers) = explode(':', $key, 2);
             else $modifiers = false;
@@ -1367,10 +1367,10 @@ class DocumentParser {
             else $replace[$i]= $key;
         endforeach;
         
-        $content= str_replace($matches['0'], $replace, $content);
+        $content= str_replace($matches[0], $replace, $content);
         if ($this->debug)
         {
-            $_ = join(', ', $matches['0']);
+            $_ = join(', ', $matches[0]);
             $this->addLogEntry('$modx->'.__FUNCTION__ . "[{$_}]",$fstart);
         }
         return $content;
@@ -1386,7 +1386,7 @@ class DocumentParser {
         if(!$matches) return $content;
         
         $replace= array ();
-        foreach($matches['1'] as $i=>$key):
+        foreach($matches[1] as $i=>$key):
             if(strpos($key,':')!==false && $this->config['output_filter']!=='0')
                 list($key,$modifiers) = explode(':', $key, 2);
             else $modifiers = false;
@@ -1419,10 +1419,10 @@ class DocumentParser {
             $replace[$i] = $value;
         endforeach;
         
-        $content= str_replace($matches['0'], $replace, $content);
+        $content= str_replace($matches[0], $replace, $content);
         if ($this->debug)
         {
-            $_ = join(', ', $matches['0']);
+            $_ = join(', ', $matches[0]);
             $this->addLogEntry('$modx->'.__FUNCTION__ . "[{$_}]",$fstart);
         }
         return $content;
@@ -1440,7 +1440,7 @@ class DocumentParser {
         $matches = $this->getTagsFromContent($content,'[+','+]');
         if(!$matches) return $content;
         $replace = array();
-        foreach($matches['1'] as $i=>$key):
+        foreach($matches[1] as $i=>$key):
             $doReplace = true;
             if(strpos($key,':')!==false && $this->config['output_filter']!=='0')
                 list($key,$modifiers) = explode(':', $key, 2);
@@ -1463,15 +1463,15 @@ class DocumentParser {
             }
             // here we'll leave empty placeholders for last.
             if ($value === '' || $doReplace===false) {
-                unset ($matches['0'][$i]);
-                unset ($matches['1'][$i]);
+                unset ($matches[0][$i]);
+                unset ($matches[1][$i]);
             }
             else               $replace[$i]= $value;
         endforeach;
-        $content= str_replace($matches['0'], $replace, $content);
+        $content= str_replace($matches[0], $replace, $content);
         if ($this->debug)
         {
-            $_ = join(', ', $matches['0']);
+            $_ = join(', ', $matches[0]);
             $this->addLogEntry('$modx->'.__FUNCTION__ . "[{$_}]",$fstart);
         }
         return $content;
@@ -1486,11 +1486,11 @@ class DocumentParser {
         $matches = $this->getTagsFromContent($content,$left,$right);
         if(!empty($matches))
         {
-            foreach($matches['1'] as $i=>$v)
+            foreach($matches[1] as $i=>$v)
             {
-                $matches['1'][$i] = $this->parseDocumentSource($v);
+                $matches[1][$i] = $this->parseDocumentSource($v);
             }
-            $content = str_replace($matches['0'],$matches['1'],$content);
+            $content = str_replace($matches[0],$matches[1],$content);
         }
         if ($this->debug) $this->addLogEntry('$modx->'.__FUNCTION__,$fstart);
         return $content;
@@ -1502,7 +1502,7 @@ class DocumentParser {
         $matches = $this->getTagsFromContent($content,$left,$right);
         if(!empty($matches))
         {
-            $content = str_replace($matches['0'],'',$content);
+            $content = str_replace($matches[0],'',$content);
         }
         return $content;
     }
@@ -1516,7 +1516,7 @@ class DocumentParser {
         $matches = $this->getTagsFromContent($content,$left,$right);
         if(!empty($matches))
         {
-            foreach($matches['0'] as $i=>$v)
+            foreach($matches[0] as $i=>$v)
             {
                 $cmd = substr($v,8,strpos($v,'-->')-8);
                 $cmd = trim($cmd);
@@ -1532,19 +1532,19 @@ class DocumentParser {
                         break;
                 }
                 $cmd = trim($cmd);
-                if(strpos($matches['1'][$i],'<!--@ELSE-->')) {
-                    list($if_content,$else_content) = explode('<!--@ELSE-->',$matches['1'][$i]);
+                if(strpos($matches[1][$i],'<!--@ELSE-->')) {
+                    list($if_content,$else_content) = explode('<!--@ELSE-->',$matches[1][$i]);
                 } else {
-                    $if_content = $matches['1'][$i];
+                    $if_content = $matches[1][$i];
                     $else_content = '';
                 }
                     
                 if( ($cond===true && empty($cmd)) || ($cond===false && !empty($cmd)) )
-                    $matches['1'][$i] = $else_content;
+                    $matches[1][$i] = $else_content;
                 else
-                    $matches['1'][$i] = substr($if_content,strpos($if_content,'-->')+3);
+                    $matches[1][$i] = substr($if_content,strpos($if_content,'-->')+3);
             }
-            $content = str_replace($matches['0'],$matches['1'],$content);
+            $content = str_replace($matches[0],$matches[1],$content);
         }
         if ($this->debug) $this->addLogEntry('$modx->'.__FUNCTION__,$fstart);
         return $content;
@@ -1685,7 +1685,7 @@ class DocumentParser {
             }
             $replace[$i] = $this->_get_snip_result($value);
         }
-        $content = str_replace($matches['0'], $replace, $content);
+        $content = str_replace($matches[0], $replace, $content);
         return $content;
     }
     
@@ -2536,7 +2536,7 @@ class DocumentParser {
         $matches = $this->getTagsFromContent($content,'[~','~]');
         if(!$matches) return $content;
         
-        foreach($matches['1'] as $i=>$key)
+        foreach($matches[1] as $i=>$key)
         {
             $key_org = $key;
             $key = trim($key);
@@ -2568,7 +2568,7 @@ class DocumentParser {
                 $replace[$i] = $key;
             }
         }
-        $content = str_replace($matches['0'], $replace, $content);
+        $content = str_replace($matches[0], $replace, $content);
         return $content;
     }
     
@@ -2633,7 +2633,7 @@ class DocumentParser {
         $matches = $this->getTagsFromContent($content,$left,$right);
         if(!$matches) return $content;
         $replace= array ();
-        foreach($matches['1'] as $i=>$key):
+        foreach($matches[1] as $i=>$key):
             if(strpos($key,':')!==false && $this->config['output_filter']!=='0')
                 list($key,$modifiers) = explode(':', $key, 2);
             else $modifiers = false;
@@ -2649,12 +2649,12 @@ class DocumentParser {
                 $replace[$i]= $value;
             }
             elseif($cleanup) $replace[$i] = '';
-            else             $replace[$i] = $matches['0'][$i];
+            else             $replace[$i] = $matches[0][$i];
         endforeach;
-        $content= str_replace($matches['0'], $replace, $content);
+        $content= str_replace($matches[0], $replace, $content);
         if ($this->debug)
         {
-            $_ = join(', ', $matches['0']);
+            $_ = join(', ', $matches[0]);
             $this->addLogEntry('$modx->'.__FUNCTION__ . "[{$_}]",$fstart);
         }
         return $content;
