@@ -489,6 +489,20 @@ class PHx {
 			case 'encode_sha1':
 				$value = sha1($value);
 				break;
+			case 'trim_to':
+				if(strpos($opt,'+'))
+					list($len,$str) = explode('+',$opt,2);
+				else {
+					$len = $opt;
+					$str = '';
+				}
+				if(preg_match('/^[1-9][0-9]*$/',$len)) {
+					$value = $this->substr($value,0,$len) . $str;
+				}
+				elseif(preg_match('/^\-[1-9][0-9]*$/',$len)) {
+					$value = $this->substr($value,$len) . $str;
+				}
+				break;
 			case 'nl2br':
 				if($modx->config['mce_element_format']==='html')
 					$value = nl2br($value,false);
