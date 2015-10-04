@@ -503,6 +503,9 @@ class PHx {
 					$value = $this->substr($value,$len) . $str;
 				}
 				break;
+			case 'br2nl':
+				$value = preg_replace('@<br[\s/]*>@i', "\n", $value);
+				break;
 			case 'nl2br':
 				if($modx->config['mce_element_format']==='html')
 					$value = nl2br($value,false);
