@@ -187,7 +187,7 @@ class PHx {
 	{
 		if($value!=='') return false;
 		
-		$_ = explode(',', 'id,ifempty,input,if,equals,is,eq,notequals,isnot,isnt,ne,find,preg,or,and,show,this,then,else,select,switch,summary,smart_description,smart_desc,isinrole,ir,memberof,mo,in');
+		$_ = explode(',', 'id,ifempty,input,if,equals,is,eq,notequals,isnot,isnt,ne,find,preg,or,and,show,this,then,else,select,switch,summary,smart_description,smart_desc,isinrole,ir,memberof,mo,in,wildcard_match,wcard_match,wildcard,wcard,fnmatch');
 		if(in_array($cmd,$_)) return false;
 		else                  return true;
 	}
@@ -233,6 +233,12 @@ class PHx {
             case 'in':
                 $opt = explode(',', $opt);
                 $condition[] = intval(in_array($value, $opt)!==false);break;
+            case 'wildcard_match':
+            case 'wcard_match':
+            case 'wildcard':
+            case 'wcard':
+            case 'fnmatch':
+                $condition[] = intval(fnmatch($opt, $value)!==false);break;
 			case 'preg':
 			case 'preg_match':
 				$condition[] = intval(preg_match($opt,$value));break;
