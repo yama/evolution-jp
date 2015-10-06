@@ -187,7 +187,7 @@ class PHx {
 	{
 		if($value!=='') return false;
 		
-		$_ = explode(',', 'id,ifempty,input,if,equals,is,eq,notequals,isnot,isnt,ne,find,preg,or,and,show,this,then,else,select,switch,summary,smart_description,smart_desc,isinrole,ir,memberof,mo,in,wildcard_match,wcard_match,wildcard,wcard,fnmatch');
+		$_ = explode(',', 'id,ifempty,input,if,equals,is,eq,notequals,isnot,isnt,ne,find,preg,or,and,show,this,then,else,select,switch,summary,smart_description,smart_desc,isinrole,ir,memberof,mo,is_file,is_dir,file_exists,is_readable,is_writable,in,wildcard_match,wcard_match,wildcard,wcard,fnmatch,is_image,regex,preg_match');
 		if(in_array($cmd,$_)) return false;
 		else                  return true;
 	}
@@ -239,6 +239,24 @@ class PHx {
             case 'wcard':
             case 'fnmatch':
                 $condition[] = intval(fnmatch($opt, $value)!==false);break;
+            case 'is_file':
+            case 'is_dir':
+            case 'file_exists':
+            case 'is_readable':
+            case 'is_writable':
+                if(!$opt) $path = $value;
+                else      $path = $opt;
+                if(strpos($path,MODX_MANAGER_PATH)!==false) exit('Can not read core path');
+                if(!$opt) $path = $value;
+                else      $path = $opt;
+                $condition[] = intval($cmd($path)!==false);break;
+            case 'is_image':
+                if(!$opt) $path = $value;
+                else      $path = $opt;
+                if(!is_file($path)) {$this->condition[]='0';break;}
+                $_ = getimagesize($path);
+                $condition[] = intval($_[0]);break;
+            case 'regex':
 			case 'preg':
 			case 'preg_match':
 				$condition[] = intval(preg_match($opt,$value));break;
