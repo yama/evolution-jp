@@ -43,7 +43,7 @@
 		else $widget_output = $value;
 		ob_end_clean();
 	}
-	elseif($value==='')
+	elseif($params['output']==='')
 		return;
 	else
 		$widget_output = $params['output'];
