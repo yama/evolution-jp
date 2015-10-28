@@ -229,7 +229,7 @@ class EXPORT_SITE
 			{ // needs making a folder
 				$end_dir = ($row['alias']!=='') ? $row['alias'] : $row['id'];
 				$dir_path = $dirpath . $end_dir;
-				if(strpos($dir_path,MODX_BASE_PATH)===false) return FALSE;
+				if(strpos($dir_path,MODX_BASE_PATH)!==0) return FALSE;
 				if (!is_dir($dir_path))
 				{
 					if (is_file($dir_path)) @unlink($dir_path);
