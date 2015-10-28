@@ -24,7 +24,6 @@ $maxtime = (preg_match('@^[0-9]+$@',$_POST['maxtime'])) ? $_POST['maxtime'] : 60
 $modx->export->maxtime       = $maxtime;
 $modx->export->generate_mode = $_POST['generate_mode'];
 $modx->export->setExportDir($export_dir);
-$modx->export->removeDirectoryAll($export_dir);
 
 $ignore_ids      = $modx->getOption('export_ignore_ids');
 $repl_before     = $modx->getOption('export_repl_before');

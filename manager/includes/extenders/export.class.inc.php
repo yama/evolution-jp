@@ -11,6 +11,7 @@ class EXPORT_SITE
 	var $repl_after;
 	var $output = array();
 	var $maxtime;
+	var $lock_file_path;
 	
 	function EXPORT_SITE()
 	{
@@ -26,6 +27,7 @@ class EXPORT_SITE
 		$this->maxtime = 60;
 		$modx->config['site_status'] = '1';
 		if(!isset($this->total)) $this->getTotal();
+		$this->lock_file_path = MODX_BASE_PATH . 'assets/cache/export.lock';
 	}
 	
 	function getPastTime()
@@ -88,6 +90,8 @@ class EXPORT_SITE
 	
 	function removeDirectoryAll($directory='')
 	{
+		if(is_file($this->lock_file_path)) return;
+		
 		if(empty($directory)) $directory = $this->targetDir;
 		$directory = rtrim($directory,'/');
 		// if the path is not valid or is not a directory ...
@@ -192,6 +196,10 @@ class EXPORT_SITE
 		$msg_success            = $this->makeMsg('success');
 		$msg_success_skip_doc   = $this->makeMsg('success_skip_doc');
 		$msg_success_skip_dir   = $this->makeMsg('success_skip_dir');
+		
+		if(!is_file($this->lock_file_path))
+			$this->removeDirectoryAll($this->targetDir);
+		touch($this->lock_file_path);
 		
 		while($row = $modx->db->getRow($rs))
 		{
