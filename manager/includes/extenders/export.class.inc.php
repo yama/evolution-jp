@@ -92,7 +92,7 @@ class EXPORT_SITE
 		$directory = rtrim($directory,'/');
 		// if the path is not valid or is not a directory ...
 		if(empty($directory)) return false;
-		if(strpos($directory,MODX_BASE_PATH)===false) return FALSE;
+		if(strpos($directory,MODX_BASE_PATH)!==0) return FALSE;
 		
 		if(!is_dir($directory))          return FALSE;
 		elseif(!is_readable($directory)) return FALSE;
