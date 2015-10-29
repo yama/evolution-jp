@@ -54,12 +54,10 @@ class errorHandler{
 	
 	function dumpError() {
 		global $modx, $_lang;
-		if(!isset($_GET['count_attempts']))
+		if(strpos($_SESSION['previous_request_uri'],'?')!==false && !isset($_GET['count_attempts']))
 		{
-			if(strpos($_SESSION['previous_request_uri'],'&count_attempts')===false)
-				$previous_request_uri = $_SESSION['previous_request_uri'] . '&count_attempts=1';
-			else
-				$previous_request_uri = $_SESSION['previous_request_uri'];
+			$delim = strpos($_SESSION['previous_request_uri'],'?')===false ? '?':'&';
+			$previous_request_uri = $_SESSION['previous_request_uri'] . $delim . 'count_attempts=1';
 		}
 		else                                $previous_request_uri = 'index.php?a=2';
 		
