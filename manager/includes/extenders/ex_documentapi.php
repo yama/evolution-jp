@@ -66,19 +66,18 @@ class Document extends ElementBase
 	 * __construct
 	 *
 	 * @param $id    リソースID(blank=New resource)
-	 * @param $status 読み込むリソースのステータス(新規の時は利用されない)
 	 * @param $level ログレベル
 	 * @return none
 	 *
 	 */
-	public function __construct($id='',$status=self::ST_RELEASED,$level=''){
-		parent::__construct('resource','Document Object API',$level);
+	public function __construct($id='',$level=''){
+		parent::__construct('Document Object API','resource',$id,$level);
 
 		if( empty($id) ){
 			$this->content = $this->content_lists;
 			$this->tv = array();
 		}else{
-			$this->load($id,$status);
+			$this->load($id);
 		}
 	}
 
@@ -357,6 +356,8 @@ SQL_QUERY;
 
 	/*
 	 * リソースの読み込み
+	 *
+	 *  ※draftの読み込み機能は廃止予定
 	 *
 	 * @param $id リソースID
 	 * @param $status 読み込むリソースのステータス
