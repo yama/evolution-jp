@@ -1222,20 +1222,38 @@ class DocumentParser {
         $timeNow= $_SERVER['REQUEST_TIME'] + $this->config['server_offset_time'];
         
         if ($timeNow < $this->cacheRefreshTime || $this->cacheRefreshTime == 0) return;
-        
-        $rs = $this->db->select('*','[+prefix+]site_revision', "pub_date<{$timeNow}");
-        if(0<$this->db->getRecordCount($rs))
+
+        //下書き採用(今のところリソースのみ)
+        $draft_ids = array();
+        $rs = $this->db->select('element,elmid','[+prefix+]site_revision', "pub_date<{$timeNow} AND status = 'standby'");
+        while( $row = $this->db->getRow($rs) ){
+            if( $row['element'] == 'resource' ){
+                $draft_ids[] = $row['elmid'];
+            }
+        }
+        if( !empty($draft_ids) ){
             $this->updateDraft();
+        }
         
         // now, check for documents that need publishing
+        $pub_ids = array();
         $fields = "published='1', publishedon=pub_date";
         $where = "pub_date <= {$timeNow} AND pub_date!=0 AND published=0";
-        $rs = $this->db->update($fields,'[+prefix+]site_content',$where);
+        $rs = $this->db->select('id','[+prefix+]site_content',$where);
+        while( $row = $this->db->getRow($rs) ){ $pub_ids[] = $row['id']; }
+        if( !empty($pub_ids) ){
+            $rs = $this->db->update($fields,'[+prefix+]site_content',$where);
+        }
         
         // now, check for documents that need un-publishing
+        $unpub_ids = array();
         $fields = "published='0', publishedon='0'";
         $where = "unpub_date <= {$timeNow} AND unpub_date!=0 AND published=1";
-        $rs = $this->db->update($fields,'[+prefix+]site_content',$where);
+        $rs = $this->db->select('id','[+prefix+]site_content',$where);
+        while( $row = $this->db->getRow($rs) ){ $unpub_ids[] = $row['id']; }
+        if( !empty($unpub_ids) ){
+            $rs = $this->db->update($fields,'[+prefix+]site_content',$where);
+        }
     
         // now, check for chunks that need publishing
         $fields = "published='1'";
@@ -1253,6 +1271,20 @@ class DocumentParser {
         unset($this->chunkCache);
         $this->setChunkCache();
         $this->setAliasListing();
+
+        //invoke events
+        if( !empty($pub_ids) ){
+            $tmp = array('docid'=>$pub_ids,'type'=>'scheduled');
+            $this->invokeEvent('OnDocPublished',$tmp);
+        }
+        if( !empty($draft_ids) ){
+            $tmp = array('docid'=>$draft_ids,'type'=>'draftScheduled');
+            $this->invokeEvent('OnDocPublished',$tmp);
+        }
+        if( !empty($unpub_ids) ){
+            $tmp = array('docid'=>$unpub_ids,'type'=>'scheduled');
+            $this->invokeEvent('OnDocUnPublished',$tmp);
+        }
     }
     
     function getTagsFromContent($content,$left='[+',$right='+]') {
@@ -2418,8 +2450,9 @@ class DocumentParser {
             $where_published = "AND sc.published='{$published}'";
         else
             $where_published = '';
-        
-        $where = "(sc.id IN ({$ids_str}) {$where_published} AND sc.deleted={$deleted} {$where}) AND (sc.private{$context}=0 {$cond} OR 1='{$_SESSION['mgrRole']}') GROUP BY sc.id";
+
+        $tmp = isset($_SESSION['mgrRole']) ? $_SESSION['mgrRole'] : '';
+        $where = "(sc.id IN ({$ids_str}) {$where_published} AND sc.deleted={$deleted} {$where}) AND (sc.private{$context}=0 {$cond} OR 1='{$tmp}') GROUP BY sc.id";
         $orderby = ($sort) ? "{$sort} {$dir}" : '';
         $result= $this->db->select($fields,$from,$where,$orderby,$limit);
         $resourceArray= array ();
@@ -2757,15 +2790,17 @@ class DocumentParser {
         if($key==='') return false;
 		$onCache = true;
 
-        if(!isset($this->chunkCache[$key]))
-        {
+        if( isset($this->chunkCache[$key]) ){
+            $isCache = true;
+            $value = $this->chunkCache[$key];
+        }else{
+            $isCache = false;
 			$where = "`name`='%s' AND (`published`='1' OR 
                                        (`pub_date` <> 0 AND `pub_date` < %d AND ( `unpub_date` = 0 OR `unpub_date` > %d) )
                                       )";
             $where = sprintf($where,  $this->db->escape($key), $this->baseTime,$this->baseTime);
             $rs    = $this->db->select('snippet,published','[+prefix+]site_htmlsnippets',$where);
-            if ($this->db->getRecordCount($rs)==1)
-            {
+            if ($this->db->getRecordCount($rs)==1){
                 $row= $this->db->getRow($rs);
                 $value = $row['snippet'];
 				if( $row['published'] == 0 ){ //publishedが0じゃないものはキャッシュしない
@@ -2776,9 +2811,14 @@ class DocumentParser {
 
 			if( $onCache )
 				$this->chunkCache[$key] = $value;
-			return $value;
+
         }
-        return $this->chunkCache[$key];
+
+        $params = array('name' => $key ,'value' => $value , 'isCache' => $isCache);
+        $this->invokeEvent('OnCallChunk',$params);
+
+        return $params['value'];
+
     }
     
     function parseChunk($chunkName, $chunkArr, $prefix= '{', $suffix= '}',$mode='chunk')
@@ -3248,7 +3288,7 @@ class DocumentParser {
             // load default params/properties
             $parameter = $this->parseProperties($pluginProperties);
             if (!empty($extParams)) $parameter= array_merge($parameter, $extParams);
-            
+
             // eval plugin
             $this->event->activePlugin= $pluginName;
             $output = $this->evalPlugin($pluginCode, $parameter);
