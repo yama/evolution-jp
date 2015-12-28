@@ -134,7 +134,7 @@ class DocumentParser {
         @ ini_set('track_errors', '1'); // enable error tracking in $php_errormsg
         $this->error_reporting = 1;
         // Don't show PHP errors to the public
-        if($this->checkSession()===false && !defined('MODX_API_MODE')) @ini_set('display_errors','0');
+        if($this->isLoggedIn()===false && !defined('MODX_API_MODE')) @ini_set('display_errors','0');
         if(!isset($this->tstart))
         {
             $mtime = explode(' ',microtime());
@@ -928,18 +928,22 @@ class DocumentParser {
     }
     
     // check for manager login session
-    function checkSession()
-    {
+    function isLoggedIn() {
         if(isset($_SESSION['mgrValidated']) && !empty($_SESSION['mgrValidated']))
         {
             return true;
         }
         else return false;
     }
+    
+    function checkSession()
+    {
+        return $this->isLoggedIn();
+    }
 
     function checkPreview()
     {
-        if ($this->checkSession() == true)
+        if ($this->isLoggedIn() == true)
         {
             if (isset ($_REQUEST['z']) && $_REQUEST['z'] == 'manprev')
             {
@@ -963,7 +967,7 @@ class DocumentParser {
         {
             return true; // site online
         }
-        elseif($this->config['site_status'] == 0 && $this->checkSession())
+        elseif($this->config['site_status'] == 0 && $this->isLoggedIn())
         {
             return true; // site offline but launched via the manager
         }
