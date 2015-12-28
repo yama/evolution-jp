@@ -759,6 +759,7 @@ class PHx {
 					$php = preg_replace('@^\s*<\?php@', '', $php);
 					$php = preg_replace('@?>\s*$@', '', $php);
 					$php = preg_replace('@^<\?@', '', $php);
+					if($this->elmName!=='')
 					$modx->snippetCache[$this->elmName.'Props'] = '';
 				}
 				else
@@ -767,7 +768,7 @@ class PHx {
 				}
 			}
 			else $php = false;
-			$modx->snippetCache[$this->elmName]= $php;
+			if($this->elmName!=='') $modx->snippetCache[$this->elmName]= $php;
 		}
 		if($php==='') $php=false;
 		
