@@ -3610,6 +3610,7 @@ class DocumentParser {
         }
         else
         {
+            $alias = $this->db->escape($aliasPath);
             $rs = $this->db->select('id', '[+prefix+]site_content', "deleted=0 and alias='{$alias}'", 'parent, menuindex');
             $row = $this->db->getRow($rs);
             
