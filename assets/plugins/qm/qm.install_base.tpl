@@ -12,6 +12,7 @@
  * @internal	@modx_category Manager and Admin
  * @internal    @legacy_names QM+,QuickEdit
  * @internal    @installset base
+ * @internal    @disabled 1
  */
 
 $version = '1.5.5r7';
